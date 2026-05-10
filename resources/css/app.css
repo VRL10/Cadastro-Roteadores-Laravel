@@ -84,6 +84,8 @@ html {
     min-height: 100vh;
     background: radial-gradient(circle at top right, #f0f9ff 0%, #f8fafc 35%, #f3f4f6 100%);
     color: #0f172a;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .rg-cabecalho {
@@ -92,10 +94,10 @@ html {
 
 .rg-cabecalho-gradiente {
     border-radius: 1rem;
-    background: linear-gradient(130deg, #0b5ed7 0%, #0369a1 60%, #0f766e 100%);
+    background: #0b5ed7;
     color: #fff;
     padding: 1.5rem;
-    box-shadow: 0 14px 28px rgba(14, 116, 144, 0.25);
+    box-shadow: 0 14px 28px rgba(11, 94, 215, 0.28);
 }
 
 .rg-cabecalho h1 {
@@ -107,16 +109,24 @@ html {
 
 .rg-conteudo {
     padding: 1.25rem 1.5rem 2rem;
+    width: 100%;
+    min-width: 0;
 }
 
 .rg-alerta {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     padding: 0.85rem 1rem;
     border-radius: 0.75rem;
     border: 1px solid transparent;
     align-items: center;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    max-width: min(420px, calc(100vw - 2rem));
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
 }
 
 .rg-alerta strong {
@@ -179,6 +189,8 @@ html {
 .rg-painel {
     display: grid;
     gap: 1rem;
+    width: 100%;
+    min-width: 0;
 }
 
 .rg-card {
@@ -187,6 +199,9 @@ html {
     background: rgba(255, 255, 255, 0.93);
     border: 1px solid #e2e8f0;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .rg-card h3 {
@@ -243,8 +258,35 @@ html {
     color: #0f172a;
 }
 
+.rg-card textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.68rem;
+    padding: 0.62rem 0.75rem;
+    background: #ffffff;
+    color: #0f172a;
+}
+
+.rg-textarea-observacoes {
+    resize: none;
+    min-height: 2.7rem;
+    line-height: 1.35;
+}
+
+.rg-botao-senha {
+    margin-top: 0.45rem;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
 .rg-card input:focus,
-.rg-card select:focus {
+.rg-card select:focus,
+.rg-card textarea:focus {
     outline: none;
     border-color: #38bdf8;
     box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
@@ -300,7 +342,10 @@ html {
 
 .rg-tabela-wrap {
     max-height: 420px;
-    overflow: auto;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     border: 1px solid #cbd5e1;
     border-radius: 0.7rem;
 }
@@ -310,12 +355,20 @@ html {
     border-collapse: collapse;
 }
 
+.rg-tabela-reparticoes,
+.rg-tabela-roteadores {
+    table-layout: fixed;
+}
+
 .rg-tabela th,
 .rg-tabela td {
     padding: 0.65rem 0.7rem;
     border-bottom: 1px solid #e2e8f0;
     text-align: left;
     font-size: 0.9rem;
+    vertical-align: top;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .rg-tabela th {
@@ -324,6 +377,18 @@ html {
     background: #dbeafe;
     color: #1e3a8a;
     font-weight: 700;
+    white-space: nowrap;
+}
+
+.rg-tabela-reparticoes th:nth-child(6) {
+    width: 240px;
+}
+
+.rg-tabela-reparticoes td:nth-child(6) {
+    max-width: 240px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .rg-tabela tbody tr {
@@ -374,13 +439,7 @@ html {
     }
 }
 
-@media (max-width: 760px) {
-    .rg-cabecalho,
-    .rg-conteudo {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-    }
-
+@media (max-width: 980px) {
     .rg-grid-filtro,
     .rg-grid-2 {
         grid-template-columns: 1fr;
@@ -389,6 +448,69 @@ html {
     .rg-acoes {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .rg-cabecalho,
+    .rg-conteudo {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .rg-card {
+        padding: 0.85rem;
+    }
+
+    .rg-tabela-reparticoes {
+        min-width: 760px;
+    }
+
+    .rg-tabela-roteadores {
+        min-width: 720px;
+    }
+
+    .rg-tabela-macs {
+        min-width: 620px;
+    }
+}
+
+@media (max-width: 560px) {
+    .rg-abas {
+        grid-template-columns: 1fr;
+    }
+
+    .rg-cabecalho h1 {
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+
+    .rg-acoes {
+        grid-template-columns: 1fr;
+    }
+
+    .rg-tabela th,
+    .rg-tabela td {
+        font-size: 0.8rem;
+        padding: 0.52rem 0.5rem;
+    }
+
+    .rg-tabela-reparticoes {
+        min-width: 700px;
+    }
+
+    .rg-tabela-roteadores {
+        min-width: 660px;
+    }
+
+    .rg-tabela-macs {
+        min-width: 560px;
+    }
+
+    .rg-alerta {
+        left: 0.75rem;
+        right: 0.75rem;
+        max-width: none;
     }
 }
 

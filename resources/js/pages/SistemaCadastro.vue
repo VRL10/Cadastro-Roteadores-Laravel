@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref } from 'vue';
 
 type Reparticao = {
     id: number;
@@ -118,12 +118,138 @@ const combos = reactive({
 });
 
 const ipRelatorioSelecionado = ref('');
+const exibirSenhaRoteador = ref(false);
+const campoObservacoesRef = ref<HTMLTextAreaElement | null>(null);
 
 const classeAlerta = computed(() => {
     if (alerta.tipo === 'sucesso') return 'rg-alerta-sucesso';
     if (alerta.tipo === 'erro') return 'rg-alerta-erro';
     if (alerta.tipo === 'aviso') return 'rg-alerta-aviso';
     return 'rg-alerta-info';
+});
+
+function normalizarTexto(valor?: string | null): string {
+    return (valor || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+}
+
+function termoAutomaticoValido(valor?: string | null): string {
+    const termo = normalizarTexto(valor);
+    return termo.length >= 4 ? termo : '';
+}
+
+function podeAplicarFiltro(valor?: string | null): boolean {
+    const termo = normalizarTexto(valor);
+    return termo.length === 0 || termo.length >= 4;
+}
+
+function apenasDigitos(valor: string): string {
+    return valor.replace(/\D/g, '');
+}
+
+function formatarTelefoneBrasil(valor: string): string {
+    const digitos = apenasDigitos(valor).slice(0, 11);
+
+    if (digitos.length <= 2) return digitos;
+    if (digitos.length <= 6) return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`;
+    if (digitos.length <= 10) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`;
+
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+}
+
+function validarTelefoneBrasil(valor: string): boolean {
+    const tamanho = apenasDigitos(valor).length;
+    return tamanho === 10 || tamanho === 11;
+}
+
+function aoDigitarTelefone(evento: Event) {
+    const alvo = evento.target as HTMLInputElement;
+    formularioReparticao.telefone = formatarTelefoneBrasil(alvo.value);
+}
+
+function validarIpV4(valor: string): boolean {
+    const ip = valor.trim();
+    const blocos = ip.split('.');
+
+    if (blocos.length !== 4) return false;
+
+    return blocos.every((bloco) => {
+        if (!/^\d+$/.test(bloco)) return false;
+        if (bloco.length > 1 && bloco.startsWith('0')) return false;
+        const numero = Number(bloco);
+        return numero >= 0 && numero <= 255;
+    });
+}
+
+function formatarMac(valor: string): string {
+    const hex = valor.replace(/[^0-9a-fA-F]/g, '').toUpperCase().slice(0, 12);
+    const grupos: string[] = [];
+
+    for (let i = 0; i < hex.length; i += 2) {
+        grupos.push(hex.slice(i, i + 2));
+    }
+
+    return grupos.join(':');
+}
+
+function validarMac(valor: string): boolean {
+    return /^([0-9A-F]{2}:){5}[0-9A-F]{2}$/.test(valor.trim().toUpperCase());
+}
+
+function aoDigitarMac(evento: Event) {
+    const alvo = evento.target as HTMLInputElement;
+    formularioMac.mac_address = formatarMac(alvo.value);
+}
+
+function ajustarAlturaObservacoes() {
+    const campo = campoObservacoesRef.value;
+
+    if (!campo) return;
+
+    campo.style.height = 'auto';
+
+    const alturaMaxima = 280;
+    const alturaCalculada = Math.min(campo.scrollHeight, alturaMaxima);
+
+    campo.style.height = `${alturaCalculada}px`;
+    campo.style.overflowY = campo.scrollHeight > alturaMaxima ? 'auto' : 'hidden';
+}
+
+const reparticoesFiltradas = computed(() => {
+    const termo = termoAutomaticoValido(filtros.reparticoes);
+    if (!termo) return reparticoes.value;
+
+    return reparticoes.value.filter((item) => {
+        const textoItem = normalizarTexto(
+            `${item.nome_contato} ${item.nome_reparticao} ${item.telefone} ${item.endereco} ${item.observacoes || ''}`,
+        );
+        return textoItem.includes(termo);
+    });
+});
+
+const roteadoresFiltrados = computed(() => {
+    const termo = termoAutomaticoValido(filtros.roteadores);
+    if (!termo) return roteadores.value;
+
+    return roteadores.value.filter((item) => {
+        const textoItem = normalizarTexto(`${item.ip_roteador} ${item.local_roteador} ${item.usuario} ${item.nome_reparticao || ''}`);
+        return textoItem.includes(termo);
+    });
+});
+
+const macsFiltrados = computed(() => {
+    const termo = termoAutomaticoValido(filtros.macs);
+    if (!termo) return macs.value;
+
+    return macs.value.filter((item) => {
+        const textoItem = normalizarTexto(
+            `${item.mac_address} ${item.nome_usuario} ${item.funcao_usuario || ''} ${item.dispositivo || ''} ${item.ip_roteador || ''} ${item.nome_reparticao || ''}`,
+        );
+        return textoItem.includes(termo);
+    });
 });
 
 function mostrarAlerta(titulo: string, mensagem: string, tipo: Alerta['tipo'] = 'info') {
@@ -134,6 +260,33 @@ function mostrarAlerta(titulo: string, mensagem: string, tipo: Alerta['tipo'] = 
     window.setTimeout(() => {
         alerta.visivel = false;
     }, 4000);
+}
+
+function aplicarFiltroReparticoes() {
+    if (!podeAplicarFiltro(filtros.reparticoes)) {
+        mostrarAlerta('Aviso', 'Digite pelo menos 4 caracteres para filtrar.', 'aviso');
+        return;
+    }
+
+    atualizarReparticoes();
+}
+
+function aplicarFiltroRoteadores() {
+    if (!podeAplicarFiltro(filtros.roteadores)) {
+        mostrarAlerta('Aviso', 'Digite pelo menos 4 caracteres para filtrar.', 'aviso');
+        return;
+    }
+
+    atualizarRoteadores();
+}
+
+function aplicarFiltroMacs() {
+    if (!podeAplicarFiltro(filtros.macs)) {
+        mostrarAlerta('Aviso', 'Digite pelo menos 4 caracteres para filtrar.', 'aviso');
+        return;
+    }
+
+    atualizarMacs();
 }
 
 async function requisicaoJson<T>(url: string, opcoes?: RequestInit): Promise<T> {
@@ -169,9 +322,7 @@ async function atualizarReparticoes() {
     carregando.reparticoes = true;
 
     try {
-        const termo = filtros.reparticoes.trim();
-        const query = termo ? `?filtro=${encodeURIComponent(termo)}` : '';
-        reparticoes.value = await requisicaoJson<Reparticao[]>(`/api/reparticoes${query}`);
+        reparticoes.value = await requisicaoJson<Reparticao[]>('/api/reparticoes');
     } catch (erro) {
         mostrarAlerta('Erro', (erro as Error).message, 'erro');
     } finally {
@@ -185,10 +336,12 @@ function preencherFormularioReparticao(item: Reparticao) {
     formularioReparticao.telefone = item.telefone;
     formularioReparticao.endereco = item.endereco;
     formularioReparticao.observacoes = item.observacoes || '';
+    nextTick(() => ajustarAlturaObservacoes());
 }
 
 function selecionarReparticao(item: Reparticao) {
     selecionado.reparticao = item;
+    preencherFormularioReparticao(item);
     modoEdicaoReparticao.value = false;
 }
 
@@ -200,6 +353,7 @@ function limparFormularioReparticao() {
     formularioReparticao.telefone = '';
     formularioReparticao.endereco = '';
     formularioReparticao.observacoes = '';
+    nextTick(() => ajustarAlturaObservacoes());
 }
 
 function editarReparticao() {
@@ -215,6 +369,11 @@ function editarReparticao() {
 async function salvarReparticao() {
     if (!formularioReparticao.nome_contato || !formularioReparticao.nome_reparticao || !formularioReparticao.telefone || !formularioReparticao.endereco) {
         mostrarAlerta('Validacao', 'Preencha os campos obrigatorios.', 'aviso');
+        return;
+    }
+
+    if (!validarTelefoneBrasil(formularioReparticao.telefone)) {
+        mostrarAlerta('Validacao', 'Telefone invalido. Use formato brasileiro com DDD.', 'aviso');
         return;
     }
 
@@ -282,9 +441,7 @@ async function atualizarRoteadores() {
     carregando.roteadores = true;
 
     try {
-        const termo = filtros.roteadores.trim();
-        const query = termo ? `?filtro=${encodeURIComponent(termo)}` : '';
-        roteadores.value = await requisicaoJson<Roteador[]>(`/api/roteadores${query}`);
+        roteadores.value = await requisicaoJson<Roteador[]>('/api/roteadores');
     } catch (erro) {
         mostrarAlerta('Erro', (erro as Error).message, 'erro');
     } finally {
@@ -302,6 +459,7 @@ function preencherFormularioRoteador(item: Roteador) {
 
 function selecionarRoteador(item: Roteador) {
     selecionado.roteador = item;
+    preencherFormularioRoteador(item);
     modoEdicaoRoteador.value = false;
 }
 
@@ -328,6 +486,11 @@ function editarRoteador() {
 async function salvarRoteador() {
     if (!formularioRoteador.ip_roteador || !formularioRoteador.local_roteador || !formularioRoteador.usuario || !formularioRoteador.senha || !formularioRoteador.reparticao_id) {
         mostrarAlerta('Validacao', 'Preencha os campos obrigatorios.', 'aviso');
+        return;
+    }
+
+    if (!validarIpV4(formularioRoteador.ip_roteador)) {
+        mostrarAlerta('Validacao', 'IP invalido. Use IPv4 no formato 192.168.0.1.', 'aviso');
         return;
     }
 
@@ -406,9 +569,7 @@ async function atualizarMacs() {
     carregando.macs = true;
 
     try {
-        const termo = filtros.macs.trim();
-        const query = termo ? `?filtro=${encodeURIComponent(termo)}` : '';
-        macs.value = await requisicaoJson<Mac[]>(`/api/macs${query}`);
+        macs.value = await requisicaoJson<Mac[]>('/api/macs');
     } catch (erro) {
         mostrarAlerta('Erro', (erro as Error).message, 'erro');
     } finally {
@@ -417,7 +578,7 @@ async function atualizarMacs() {
 }
 
 function preencherFormularioMac(item: Mac) {
-    formularioMac.mac_address = item.mac_address;
+    formularioMac.mac_address = formatarMac(item.mac_address);
     formularioMac.nome_usuario = item.nome_usuario;
     formularioMac.funcao_usuario = item.funcao_usuario || '';
     formularioMac.dispositivo = item.dispositivo || '';
@@ -426,6 +587,7 @@ function preencherFormularioMac(item: Mac) {
 
 function selecionarMac(item: Mac) {
     selecionado.mac = item;
+    preencherFormularioMac(item);
     modoEdicaoMac.value = false;
 }
 
@@ -452,6 +614,14 @@ function editarMac() {
 async function salvarMac() {
     if (!formularioMac.mac_address || !formularioMac.nome_usuario || !formularioMac.roteador_id) {
         mostrarAlerta('Validacao', 'Preencha os campos obrigatorios.', 'aviso');
+        return;
+    }
+
+    const macFormatado = formatarMac(formularioMac.mac_address);
+    formularioMac.mac_address = macFormatado;
+
+    if (!validarMac(macFormatado)) {
+        mostrarAlerta('Validacao', 'MAC invalido. Use formato AA:BB:CC:DD:EE:FF.', 'aviso');
         return;
     }
 
@@ -566,6 +736,7 @@ onMounted(async () => {
     await atualizarReparticoes();
     await carregarComboReparticoes();
     await carregarComboRoteadores();
+    ajustarAlturaObservacoes();
 });
 </script>
 
@@ -606,7 +777,7 @@ onMounted(async () => {
                         </div>
                         <div>
                             <label>📞 Telefone</label>
-                            <input v-model="formularioReparticao.telefone" type="text" />
+                            <input v-model="formularioReparticao.telefone" type="text" placeholder="(11) 99999-9999" @input="aoDigitarTelefone" />
                         </div>
                         <div>
                             <label>📍 Endereço</label>
@@ -615,7 +786,13 @@ onMounted(async () => {
                     </div>
                     <div>
                         <label>📝 Observações</label>
-                        <input v-model="formularioReparticao.observacoes" type="text" />
+                        <textarea
+                            ref="campoObservacoesRef"
+                            v-model="formularioReparticao.observacoes"
+                            class="rg-textarea-observacoes"
+                            rows="2"
+                            @input="ajustarAlturaObservacoes"
+                        ></textarea>
                     </div>
                     <div class="rg-acoes">
                         <button class="btn-sucesso" @click="salvarReparticao">💾 {{ modoEdicaoReparticao ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
@@ -629,9 +806,9 @@ onMounted(async () => {
                 <div class="rg-card rg-card-filtro">
                     <h3>🔍 Filtro</h3>
                     <div class="rg-grid-filtro">
-                        <input v-model="filtros.reparticoes" type="text" placeholder="Buscar por contato, repartição, telefone..." @keyup.enter="atualizarReparticoes" />
+                        <input v-model="filtros.reparticoes" type="text" placeholder="Buscar por contato, repartição, telefone..." @keyup.enter="aplicarFiltroReparticoes" />
                         <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="atualizarReparticoes">🔍 Aplicar Filtro</button>
+                            <button class="btn-primario" @click="aplicarFiltroReparticoes">🔍 Aplicar Filtro</button>
                             <button class="btn-secundario" @click="() => { filtros.reparticoes = ''; atualizarReparticoes(); }">🗑️ Limpar Filtro</button>
                         </div>
                     </div>
@@ -640,7 +817,7 @@ onMounted(async () => {
                 <div class="rg-card rg-card-lista">
                     <h3>📋 Repartições Cadastradas</h3>
                     <div class="rg-tabela-wrap">
-                        <table class="rg-tabela">
+                        <table class="rg-tabela rg-tabela-reparticoes">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -652,11 +829,11 @@ onMounted(async () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-if="!carregando.reparticoes && reparticoes.length === 0">
+                                <tr v-if="!carregando.reparticoes && reparticoesFiltradas.length === 0">
                                     <td colspan="6">Nenhuma repartição cadastrada.</td>
                                 </tr>
                                 <tr
-                                    v-for="item in reparticoes"
+                                    v-for="item in reparticoesFiltradas"
                                     :key="item.id"
                                     :class="{ selecionada: selecionado.reparticao?.id === item.id }"
                                     @click="selecionarReparticao(item)"
@@ -692,7 +869,10 @@ onMounted(async () => {
                         </div>
                         <div>
                             <label>🔑 Senha</label>
-                            <input v-model="formularioRoteador.senha" type="password" />
+                            <input v-model="formularioRoteador.senha" :type="exibirSenhaRoteador ? 'text' : 'password'" />
+                            <button type="button" class="rg-botao-senha" @click="exibirSenhaRoteador = !exibirSenhaRoteador">
+                                {{ exibirSenhaRoteador ? 'Ocultar senha' : 'Ver senha' }}
+                            </button>
                         </div>
                     </div>
                     <div>
@@ -715,9 +895,9 @@ onMounted(async () => {
                 <div class="rg-card rg-card-filtro">
                     <h3>🔍 Filtro</h3>
                     <div class="rg-grid-filtro">
-                        <input v-model="filtros.roteadores" type="text" placeholder="Buscar por IP ou local..." @keyup.enter="atualizarRoteadores" />
+                        <input v-model="filtros.roteadores" type="text" placeholder="Buscar por IP ou local..." @keyup.enter="aplicarFiltroRoteadores" />
                         <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="atualizarRoteadores">🔍 Aplicar Filtro</button>
+                            <button class="btn-primario" @click="aplicarFiltroRoteadores">🔍 Aplicar Filtro</button>
                             <button class="btn-secundario" @click="() => { filtros.roteadores = ''; atualizarRoteadores(); }">🗑️ Limpar Filtro</button>
                         </div>
                     </div>
@@ -726,7 +906,7 @@ onMounted(async () => {
                 <div class="rg-card rg-card-lista">
                     <h3>📋 Roteadores Cadastrados</h3>
                     <div class="rg-tabela-wrap">
-                        <table class="rg-tabela">
+                        <table class="rg-tabela rg-tabela-roteadores">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -734,14 +914,15 @@ onMounted(async () => {
                                     <th>Local</th>
                                     <th>Usuário</th>
                                     <th>Repartição</th>
+                                    <th>Senha</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-if="!carregando.roteadores && roteadores.length === 0">
-                                    <td colspan="5">Nenhum roteador cadastrado.</td>
+                                <tr v-if="!carregando.roteadores && roteadoresFiltrados.length === 0">
+                                    <td colspan="6">Nenhum roteador cadastrado.</td>
                                 </tr>
                                 <tr
-                                    v-for="item in roteadores"
+                                    v-for="item in roteadoresFiltrados"
                                     :key="item.id"
                                     :class="{ selecionada: selecionado.roteador?.id === item.id }"
                                     @click="selecionarRoteador(item)"
@@ -751,6 +932,7 @@ onMounted(async () => {
                                     <td>{{ item.local_roteador }}</td>
                                     <td>{{ item.usuario }}</td>
                                     <td>{{ item.nome_reparticao || '-' }}</td>
+                                    <td>{{ item.senha }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -765,7 +947,7 @@ onMounted(async () => {
                     <div class="rg-grid-2">
                         <div>
                             <label>🔗 MAC Address</label>
-                            <input v-model="formularioMac.mac_address" type="text" placeholder="00:00:00:00:00:00" />
+                            <input v-model="formularioMac.mac_address" type="text" placeholder="00:00:00:00:00:00" @input="aoDigitarMac" />
                         </div>
                         <div>
                             <label>👤 Nome do Usuário</label>
@@ -800,9 +982,9 @@ onMounted(async () => {
                 <div class="rg-card rg-card-filtro">
                     <h3>🔍 Filtro</h3>
                     <div class="rg-grid-filtro">
-                        <input v-model="filtros.macs" type="text" placeholder="Buscar por MAC ou usuário..." @keyup.enter="atualizarMacs" />
+                        <input v-model="filtros.macs" type="text" placeholder="Buscar por MAC ou usuário..." @keyup.enter="aplicarFiltroMacs" />
                         <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="atualizarMacs">🔍 Aplicar Filtro</button>
+                            <button class="btn-primario" @click="aplicarFiltroMacs">🔍 Aplicar Filtro</button>
                             <button class="btn-secundario" @click="() => { filtros.macs = ''; atualizarMacs(); }">🗑️ Limpar Filtro</button>
                         </div>
                     </div>
@@ -811,7 +993,7 @@ onMounted(async () => {
                 <div class="rg-card rg-card-lista">
                     <h3>📋 MAC Addresses Cadastrados</h3>
                     <div class="rg-tabela-wrap">
-                        <table class="rg-tabela">
+                        <table class="rg-tabela rg-tabela-macs">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -825,11 +1007,11 @@ onMounted(async () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-if="!carregando.macs && macs.length === 0">
+                                <tr v-if="!carregando.macs && macsFiltrados.length === 0">
                                     <td colspan="8">Nenhum MAC cadastrado.</td>
                                 </tr>
                                 <tr
-                                    v-for="item in macs"
+                                    v-for="item in macsFiltrados"
                                     :key="item.id"
                                     :class="{ selecionada: selecionado.mac?.id === item.id }"
                                     @click="selecionarMac(item)"
