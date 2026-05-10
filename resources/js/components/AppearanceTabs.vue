@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAppearance } from '@/composables/useAppearance';
+import { useAparencia } from '@/composables/useAparencia';
 import { Monitor, Moon, Sun } from 'lucide-vue-next';
 
 interface Props {
@@ -8,12 +8,12 @@ interface Props {
 
 const { class: containerClass = '' } = defineProps<Props>();
 
-const { appearance, updateAppearance } = useAppearance();
+const { appearance, atualizarAparencia } = useAparencia();
 
 const tabs = [
-    { value: 'light', Icon: Sun, label: 'Light' },
-    { value: 'dark', Icon: Moon, label: 'Dark' },
-    { value: 'system', Icon: Monitor, label: 'System' },
+    { value: 'light', Icon: Sun, label: 'Claro' },
+    { value: 'dark', Icon: Moon, label: 'Escuro' },
+    { value: 'system', Icon: Monitor, label: 'Sistema' },
 ] as const;
 </script>
 
@@ -22,7 +22,7 @@ const tabs = [
         <button
             v-for="{ value, Icon, label } in tabs"
             :key="value"
-            @click="updateAppearance(value)"
+            @click="atualizarAparencia(value)"
             :class="[
                 'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
                 appearance === value

@@ -90,6 +90,8 @@ const formularioReparticao = reactive({
     observacoes: '',
 });
 
+const modoEdicaoReparticao = ref(false);
+
 const formularioRoteador = reactive({
     ip_roteador: '',
     local_roteador: '',
@@ -98,6 +100,8 @@ const formularioRoteador = reactive({
     reparticao_id: '',
 });
 
+const modoEdicaoRoteador = ref(false);
+
 const formularioMac = reactive({
     mac_address: '',
     nome_usuario: '',
@@ -105,6 +109,8 @@ const formularioMac = reactive({
     dispositivo: '',
     roteador_id: '',
 });
+
+const modoEdicaoMac = ref(false);
 
 const combos = reactive({
     reparticoes: [] as ItemCombo[],
@@ -174,7 +180,6 @@ async function atualizarReparticoes() {
 }
 
 function preencherFormularioReparticao(item: Reparticao) {
-    selecionado.reparticao = item;
     formularioReparticao.nome_contato = item.nome_contato;
     formularioReparticao.nome_reparticao = item.nome_reparticao;
     formularioReparticao.telefone = item.telefone;
@@ -182,13 +187,29 @@ function preencherFormularioReparticao(item: Reparticao) {
     formularioReparticao.observacoes = item.observacoes || '';
 }
 
+function selecionarReparticao(item: Reparticao) {
+    selecionado.reparticao = item;
+    modoEdicaoReparticao.value = false;
+}
+
 function limparFormularioReparticao() {
     selecionado.reparticao = null;
+    modoEdicaoReparticao.value = false;
     formularioReparticao.nome_contato = '';
     formularioReparticao.nome_reparticao = '';
     formularioReparticao.telefone = '';
     formularioReparticao.endereco = '';
     formularioReparticao.observacoes = '';
+}
+
+function editarReparticao() {
+    if (!selecionado.reparticao) {
+        mostrarAlerta('Aviso', 'Selecione uma reparticao para editar.', 'aviso');
+        return;
+    }
+
+    modoEdicaoReparticao.value = true;
+    preencherFormularioReparticao(selecionado.reparticao);
 }
 
 async function salvarReparticao() {
@@ -198,38 +219,21 @@ async function salvarReparticao() {
     }
 
     try {
-        await requisicaoJson('/api/reparticoes', {
-            method: 'POST',
-            body: JSON.stringify(formularioReparticao),
-        });
+        if (modoEdicaoReparticao.value && selecionado.reparticao) {
+            await requisicaoJson(`/api/reparticoes/${selecionado.reparticao.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(formularioReparticao),
+            });
 
-        mostrarAlerta('Sucesso', 'Reparticao cadastrada com sucesso!', 'sucesso');
-        limparFormularioReparticao();
-        await atualizarReparticoes();
-        await carregarComboReparticoes();
-    } catch (erro) {
-        mostrarAlerta('Erro', (erro as Error).message, 'erro');
-    }
-}
+            mostrarAlerta('Sucesso', 'Reparticao atualizada com sucesso!', 'sucesso');
+        } else {
+            await requisicaoJson('/api/reparticoes', {
+                method: 'POST',
+                body: JSON.stringify(formularioReparticao),
+            });
 
-async function editarReparticao() {
-    if (!selecionado.reparticao) {
-        mostrarAlerta('Aviso', 'Selecione uma reparticao para editar.', 'aviso');
-        return;
-    }
-
-    if (!formularioReparticao.nome_contato || !formularioReparticao.nome_reparticao || !formularioReparticao.telefone || !formularioReparticao.endereco) {
-        mostrarAlerta('Validacao', 'Preencha os campos obrigatorios.', 'aviso');
-        return;
-    }
-
-    try {
-        await requisicaoJson(`/api/reparticoes/${selecionado.reparticao.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(formularioReparticao),
-        });
-
-        mostrarAlerta('Sucesso', 'Reparticao atualizada com sucesso!', 'sucesso');
+            mostrarAlerta('Sucesso', 'Reparticao cadastrada com sucesso!', 'sucesso');
+        }
         limparFormularioReparticao();
         await atualizarReparticoes();
         await carregarComboReparticoes();
@@ -289,7 +293,6 @@ async function atualizarRoteadores() {
 }
 
 function preencherFormularioRoteador(item: Roteador) {
-    selecionado.roteador = item;
     formularioRoteador.ip_roteador = item.ip_roteador;
     formularioRoteador.local_roteador = item.local_roteador;
     formularioRoteador.usuario = item.usuario;
@@ -297,13 +300,29 @@ function preencherFormularioRoteador(item: Roteador) {
     formularioRoteador.reparticao_id = String(item.reparticao_id);
 }
 
+function selecionarRoteador(item: Roteador) {
+    selecionado.roteador = item;
+    modoEdicaoRoteador.value = false;
+}
+
 function limparFormularioRoteador() {
     selecionado.roteador = null;
+    modoEdicaoRoteador.value = false;
     formularioRoteador.ip_roteador = '';
     formularioRoteador.local_roteador = '';
     formularioRoteador.usuario = '';
     formularioRoteador.senha = '';
     formularioRoteador.reparticao_id = combos.reparticoes.length ? String(combos.reparticoes[0].id) : '';
+}
+
+function editarRoteador() {
+    if (!selecionado.roteador) {
+        mostrarAlerta('Aviso', 'Selecione um roteador para editar.', 'aviso');
+        return;
+    }
+
+    modoEdicaoRoteador.value = true;
+    preencherFormularioRoteador(selecionado.roteador);
 }
 
 async function salvarRoteador() {
@@ -313,44 +332,27 @@ async function salvarRoteador() {
     }
 
     try {
-        await requisicaoJson('/api/roteadores', {
-            method: 'POST',
-            body: JSON.stringify({
-                ...formularioRoteador,
-                reparticao_id: Number(formularioRoteador.reparticao_id),
-            }),
-        });
+        const dadosRoteador = {
+            ...formularioRoteador,
+            reparticao_id: Number(formularioRoteador.reparticao_id),
+        };
 
-        mostrarAlerta('Sucesso', 'Roteador cadastrado com sucesso!', 'sucesso');
-        limparFormularioRoteador();
-        await atualizarRoteadores();
-        await carregarComboRoteadores();
-    } catch (erro) {
-        mostrarAlerta('Erro', (erro as Error).message, 'erro');
-    }
-}
+        if (modoEdicaoRoteador.value && selecionado.roteador) {
+            await requisicaoJson(`/api/roteadores/${selecionado.roteador.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(dadosRoteador),
+            });
 
-async function editarRoteador() {
-    if (!selecionado.roteador) {
-        mostrarAlerta('Aviso', 'Selecione um roteador para editar.', 'aviso');
-        return;
-    }
+            mostrarAlerta('Sucesso', 'Roteador atualizado com sucesso!', 'sucesso');
+        } else {
+            await requisicaoJson('/api/roteadores', {
+                method: 'POST',
+                body: JSON.stringify(dadosRoteador),
+            });
 
-    if (!formularioRoteador.ip_roteador || !formularioRoteador.local_roteador || !formularioRoteador.usuario || !formularioRoteador.senha || !formularioRoteador.reparticao_id) {
-        mostrarAlerta('Validacao', 'Preencha os campos obrigatorios.', 'aviso');
-        return;
-    }
+            mostrarAlerta('Sucesso', 'Roteador cadastrado com sucesso!', 'sucesso');
+        }
 
-    try {
-        await requisicaoJson(`/api/roteadores/${selecionado.roteador.id}`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                ...formularioRoteador,
-                reparticao_id: Number(formularioRoteador.reparticao_id),
-            }),
-        });
-
-        mostrarAlerta('Sucesso', 'Roteador atualizado com sucesso!', 'sucesso');
         limparFormularioRoteador();
         await atualizarRoteadores();
         await carregarComboRoteadores();
@@ -415,7 +417,6 @@ async function atualizarMacs() {
 }
 
 function preencherFormularioMac(item: Mac) {
-    selecionado.mac = item;
     formularioMac.mac_address = item.mac_address;
     formularioMac.nome_usuario = item.nome_usuario;
     formularioMac.funcao_usuario = item.funcao_usuario || '';
@@ -423,13 +424,29 @@ function preencherFormularioMac(item: Mac) {
     formularioMac.roteador_id = String(item.roteador_id);
 }
 
+function selecionarMac(item: Mac) {
+    selecionado.mac = item;
+    modoEdicaoMac.value = false;
+}
+
 function limparFormularioMac() {
     selecionado.mac = null;
+    modoEdicaoMac.value = false;
     formularioMac.mac_address = '';
     formularioMac.nome_usuario = '';
     formularioMac.funcao_usuario = '';
     formularioMac.dispositivo = '';
     formularioMac.roteador_id = combos.roteadores.length ? String(combos.roteadores[0].id) : '';
+}
+
+function editarMac() {
+    if (!selecionado.mac) {
+        mostrarAlerta('Aviso', 'Selecione um MAC para editar.', 'aviso');
+        return;
+    }
+
+    modoEdicaoMac.value = true;
+    preencherFormularioMac(selecionado.mac);
 }
 
 async function salvarMac() {
@@ -439,43 +456,27 @@ async function salvarMac() {
     }
 
     try {
-        await requisicaoJson('/api/macs', {
-            method: 'POST',
-            body: JSON.stringify({
-                ...formularioMac,
-                roteador_id: Number(formularioMac.roteador_id),
-            }),
-        });
+        const dadosMac = {
+            ...formularioMac,
+            roteador_id: Number(formularioMac.roteador_id),
+        };
 
-        mostrarAlerta('Sucesso', 'MAC address cadastrado com sucesso!', 'sucesso');
-        limparFormularioMac();
-        await atualizarMacs();
-    } catch (erro) {
-        mostrarAlerta('Erro', (erro as Error).message, 'erro');
-    }
-}
+        if (modoEdicaoMac.value && selecionado.mac) {
+            await requisicaoJson(`/api/macs/${selecionado.mac.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(dadosMac),
+            });
 
-async function editarMac() {
-    if (!selecionado.mac) {
-        mostrarAlerta('Aviso', 'Selecione um MAC para editar.', 'aviso');
-        return;
-    }
+            mostrarAlerta('Sucesso', 'MAC address atualizado com sucesso!', 'sucesso');
+        } else {
+            await requisicaoJson('/api/macs', {
+                method: 'POST',
+                body: JSON.stringify(dadosMac),
+            });
 
-    if (!formularioMac.mac_address || !formularioMac.nome_usuario || !formularioMac.roteador_id) {
-        mostrarAlerta('Validacao', 'Preencha os campos obrigatorios.', 'aviso');
-        return;
-    }
+            mostrarAlerta('Sucesso', 'MAC address cadastrado com sucesso!', 'sucesso');
+        }
 
-    try {
-        await requisicaoJson(`/api/macs/${selecionado.mac.id}`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                ...formularioMac,
-                roteador_id: Number(formularioMac.roteador_id),
-            }),
-        });
-
-        mostrarAlerta('Sucesso', 'MAC address atualizado com sucesso!', 'sucesso');
         limparFormularioMac();
         await atualizarMacs();
     } catch (erro) {
@@ -592,17 +593,6 @@ onMounted(async () => {
             </nav>
 
             <section v-show="abaAtiva === 'reparticoes'" class="rg-painel">
-                <div class="rg-card rg-card-filtro">
-                    <h3>🔍 Filtro</h3>
-                    <div class="rg-grid-filtro">
-                        <input v-model="filtros.reparticoes" type="text" placeholder="Buscar por contato, repartição, telefone..." @keyup.enter="atualizarReparticoes" />
-                        <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="atualizarReparticoes">🔍 Aplicar Filtro</button>
-                            <button class="btn-secundario" @click="() => { filtros.reparticoes = ''; atualizarReparticoes(); }">🗑️ Limpar Filtro</button>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="rg-card rg-card-form">
                     <h3>📝 Cadastrar/Editar Repartição</h3>
                     <div class="rg-grid-2">
@@ -628,11 +618,22 @@ onMounted(async () => {
                         <input v-model="formularioReparticao.observacoes" type="text" />
                     </div>
                     <div class="rg-acoes">
-                        <button class="btn-sucesso" @click="salvarReparticao">💾 SALVAR</button>
+                        <button class="btn-sucesso" @click="salvarReparticao">💾 {{ modoEdicaoReparticao ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
                         <button class="btn-aviso" @click="editarReparticao">✏️ EDITAR</button>
                         <button class="btn-erro" @click="excluirReparticao">🗑️ EXCLUIR</button>
                         <button class="btn-info" @click="atualizarReparticoes">🔄 ATUALIZAR</button>
                         <button class="btn-secundario" @click="limparFormularioReparticao">🧹 LIMPAR</button>
+                    </div>
+                </div>
+
+                <div class="rg-card rg-card-filtro">
+                    <h3>🔍 Filtro</h3>
+                    <div class="rg-grid-filtro">
+                        <input v-model="filtros.reparticoes" type="text" placeholder="Buscar por contato, repartição, telefone..." @keyup.enter="atualizarReparticoes" />
+                        <div class="rg-botoes-coluna">
+                            <button class="btn-primario" @click="atualizarReparticoes">🔍 Aplicar Filtro</button>
+                            <button class="btn-secundario" @click="() => { filtros.reparticoes = ''; atualizarReparticoes(); }">🗑️ Limpar Filtro</button>
+                        </div>
                     </div>
                 </div>
 
@@ -658,7 +659,7 @@ onMounted(async () => {
                                     v-for="item in reparticoes"
                                     :key="item.id"
                                     :class="{ selecionada: selecionado.reparticao?.id === item.id }"
-                                    @click="preencherFormularioReparticao(item)"
+                                    @click="selecionarReparticao(item)"
                                 >
                                     <td>{{ item.id }}</td>
                                     <td>{{ item.nome_contato }}</td>
@@ -674,17 +675,6 @@ onMounted(async () => {
             </section>
 
             <section v-show="abaAtiva === 'roteadores'" class="rg-painel">
-                <div class="rg-card rg-card-filtro">
-                    <h3>🔍 Filtro</h3>
-                    <div class="rg-grid-filtro">
-                        <input v-model="filtros.roteadores" type="text" placeholder="Buscar por IP ou local..." @keyup.enter="atualizarRoteadores" />
-                        <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="atualizarRoteadores">🔍 Aplicar Filtro</button>
-                            <button class="btn-secundario" @click="() => { filtros.roteadores = ''; atualizarRoteadores(); }">🗑️ Limpar Filtro</button>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="rg-card rg-card-form">
                     <h3>📝 Cadastrar/Editar Roteador</h3>
                     <div class="rg-grid-2">
@@ -714,11 +704,22 @@ onMounted(async () => {
                         </select>
                     </div>
                     <div class="rg-acoes">
-                        <button class="btn-sucesso" @click="salvarRoteador">💾 SALVAR</button>
+                        <button class="btn-sucesso" @click="salvarRoteador">💾 {{ modoEdicaoRoteador ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
                         <button class="btn-aviso" @click="editarRoteador">✏️ EDITAR</button>
                         <button class="btn-erro" @click="excluirRoteador">🗑️ EXCLUIR</button>
                         <button class="btn-info" @click="atualizarRoteadores">🔄 ATUALIZAR</button>
                         <button class="btn-secundario" @click="limparFormularioRoteador">🧹 LIMPAR</button>
+                    </div>
+                </div>
+
+                <div class="rg-card rg-card-filtro">
+                    <h3>🔍 Filtro</h3>
+                    <div class="rg-grid-filtro">
+                        <input v-model="filtros.roteadores" type="text" placeholder="Buscar por IP ou local..." @keyup.enter="atualizarRoteadores" />
+                        <div class="rg-botoes-coluna">
+                            <button class="btn-primario" @click="atualizarRoteadores">🔍 Aplicar Filtro</button>
+                            <button class="btn-secundario" @click="() => { filtros.roteadores = ''; atualizarRoteadores(); }">🗑️ Limpar Filtro</button>
+                        </div>
                     </div>
                 </div>
 
@@ -743,7 +744,7 @@ onMounted(async () => {
                                     v-for="item in roteadores"
                                     :key="item.id"
                                     :class="{ selecionada: selecionado.roteador?.id === item.id }"
-                                    @click="preencherFormularioRoteador(item)"
+                                    @click="selecionarRoteador(item)"
                                 >
                                     <td>{{ item.id }}</td>
                                     <td>{{ item.ip_roteador }}</td>
@@ -758,16 +759,6 @@ onMounted(async () => {
             </section>
 
             <section v-show="abaAtiva === 'macs'" class="rg-painel">
-                <div class="rg-card rg-card-filtro">
-                    <h3>🔍 Filtro</h3>
-                    <div class="rg-grid-filtro">
-                        <input v-model="filtros.macs" type="text" placeholder="Buscar por MAC ou usuário..." @keyup.enter="atualizarMacs" />
-                        <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="atualizarMacs">🔍 Aplicar Filtro</button>
-                            <button class="btn-secundario" @click="() => { filtros.macs = ''; atualizarMacs(); }">🗑️ Limpar Filtro</button>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="rg-card rg-card-form">
                     <h3>📝 Cadastrar/Editar MAC Address</h3>
@@ -798,11 +789,22 @@ onMounted(async () => {
                         </select>
                     </div>
                     <div class="rg-acoes">
-                        <button class="btn-sucesso" @click="salvarMac">💾 SALVAR</button>
+                        <button class="btn-sucesso" @click="salvarMac">💾 {{ modoEdicaoMac ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
                         <button class="btn-aviso" @click="editarMac">✏️ EDITAR</button>
                         <button class="btn-erro" @click="excluirMac">🗑️ EXCLUIR</button>
                         <button class="btn-info" @click="atualizarMacs">🔄 ATUALIZAR</button>
                         <button class="btn-secundario" @click="limparFormularioMac">🧹 LIMPAR</button>
+                    </div>
+                </div>
+
+                <div class="rg-card rg-card-filtro">
+                    <h3>🔍 Filtro</h3>
+                    <div class="rg-grid-filtro">
+                        <input v-model="filtros.macs" type="text" placeholder="Buscar por MAC ou usuário..." @keyup.enter="atualizarMacs" />
+                        <div class="rg-botoes-coluna">
+                            <button class="btn-primario" @click="atualizarMacs">🔍 Aplicar Filtro</button>
+                            <button class="btn-secundario" @click="() => { filtros.macs = ''; atualizarMacs(); }">🗑️ Limpar Filtro</button>
+                        </div>
                     </div>
                 </div>
 
@@ -830,7 +832,7 @@ onMounted(async () => {
                                     v-for="item in macs"
                                     :key="item.id"
                                     :class="{ selecionada: selecionado.mac?.id === item.id }"
-                                    @click="preencherFormularioMac(item)"
+                                    @click="selecionarMac(item)"
                                 >
                                     <td>{{ item.id }}</td>
                                     <td>{{ item.mac_address }}</td>
