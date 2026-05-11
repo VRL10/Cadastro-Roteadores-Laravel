@@ -351,7 +351,7 @@ Este termo estabelece que ambos os coproprietários possuem autonomia total e ir
 
 ## 📜 Licença
 
-Este projeto está licenciado sob a licença MIT (MIT License), permitindo livre uso, cópia, modificação, distribuição, sublicenciamento e comercialização do software, desde que os créditos autorais e o aviso da licença original sejam mantidos.
+Este projeto está licenciado sob a licença MIT (MIT License), permitindo livre uso, cópia, modificação, distribuição, sublicenciamento e comercialização do software.
 
 A licença MIT aplica-se ao projeto como um todo, sem restringir os direitos individuais de uso dos coproprietários definidos neste termo.
 
