@@ -13,48 +13,48 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
 
 interface Props {
-    mustVerifyEmail: boolean;
-    status?: string;
-    className?: string;
+    deveVerificarEmail: boolean;
+    situacao?: string;
+    nomeClasse?: string;
 }
 
 defineProps<Props>();
 
-const breadcrumbs: BreadcrumbItem[] = [
+const migalhasNavegacao: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
         href: '/settings/profile',
     },
 ];
 
-const page = usePage<SharedData>();
-const user = page.props.auth.user as User;
+const pagina = usePage<SharedData>();
+const usuario = pagina.props.auth.user as User;
 
-const form = useForm({
-    name: user.name,
-    email: user.email,
+const formulario = useForm({
+    name: usuario.name,
+    email: usuario.email,
 });
 
-const submit = () => {
-    form.patch(route('profile.update'), {
+const atualizarPerfil = () => {
+    formulario.patch(route('profile.update'), {
         preserveScroll: true,
     });
 };
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbs">
+    <AppLayout :migalhasNavegacao="migalhasNavegacao">
         <Head title="Profile settings" />
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Profile information" description="Update your name and email address" />
+                <TituloPequeno title="Profile information" description="Update your name and email address" />
 
-                <form @submit.prevent="submit" class="space-y-6">
+                <form @submit.prevent="atualizarPerfil" class="space-y-6">
                     <div class="grid gap-2">
                         <Label for="name">Name</Label>
-                        <Input id="name" class="mt-1 block w-full" v-model="form.name" required autocomplete="name" placeholder="Full name" />
-                        <InputError class="mt-2" :message="form.errors.name" />
+                        <Input id="name" class="mt-1 block w-full" v-model="formulario.name" required autocomplete="name" placeholder="Full name" />
+                        <ErroEntrada class="mt-2" :message="formulario.errors.name" />
                     </div>
 
                     <div class="grid gap-2">
@@ -63,15 +63,15 @@ const submit = () => {
                             id="email"
                             type="email"
                             class="mt-1 block w-full"
-                            v-model="form.email"
+                            v-model="formulario.email"
                             required
                             autocomplete="username"
                             placeholder="Email address"
                         />
-                        <InputError class="mt-2" :message="form.errors.email" />
+                        <ErroEntrada class="mt-2" :message="formulario.errors.email" />
                     </div>
 
-                    <div v-if="mustVerifyEmail && !user.email_verified_at">
+                    <div v-if="deveVerificarEmail && !usuario.email_verified_at">
                         <p class="mt-2 text-sm text-neutral-800">
                             Your email address is unverified.
                             <Link
@@ -84,16 +84,16 @@ const submit = () => {
                             </Link>
                         </p>
 
-                        <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
+                        <div v-if="situacao === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
                             A new verification link has been sent to your email address.
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button :disabled="form.processing">Save</Button>
+                        <Button :disabled="formulario.processing">Save</Button>
 
                         <TransitionRoot
-                            :show="form.recentlySuccessful"
+                            :show="formulario.recentlySuccessful"
                             enter="transition ease-in-out"
                             enter-from="opacity-0"
                             leave="transition ease-in-out"
@@ -105,7 +105,7 @@ const submit = () => {
                 </form>
             </div>
 
-            <DeleteUser />
+            <ExcluirUsuario />
         </SettingsLayout>
     </AppLayout>
 </template>

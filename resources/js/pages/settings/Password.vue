@@ -13,43 +13,43 @@ import { Label } from '@/components/ui/label';
 import { type BreadcrumbItem } from '@/types';
 
 interface Props {
-    className?: string;
+    nomeClasse?: string;
 }
 
 defineProps<Props>();
 
-const breadcrumbItems: BreadcrumbItem[] = [
+const migalhasNavegacao: BreadcrumbItem[] = [
     {
         title: 'Password settings',
         href: '/settings/password',
     },
 ];
 
-const passwordInput = ref<HTMLInputElement>();
-const currentPasswordInput = ref<HTMLInputElement>();
+const entradaSenha = ref<HTMLInputElement>();
+const entradaSenhaAtual = ref<HTMLInputElement>();
 
-const form = useForm({
+const formulario = useForm({
     current_password: '',
     password: '',
     password_confirmation: '',
 });
 
-const updatePassword = () => {
-    form.put(route('password.update'), {
+const atualizarSenha = () => {
+    formulario.put(route('password.update'), {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
+        onSuccess: () => formulario.reset(),
         onError: (errors: any) => {
             if (errors.password) {
-                form.reset('password', 'password_confirmation');
-                if (passwordInput.value instanceof HTMLInputElement) {
-                    passwordInput.value.focus();
+                formulario.reset('password', 'password_confirmation');
+                if (entradaSenha.value instanceof HTMLInputElement) {
+                    entradaSenha.value.focus();
                 }
             }
 
             if (errors.current_password) {
-                form.reset('current_password');
-                if (currentPasswordInput.value instanceof HTMLInputElement) {
-                    currentPasswordInput.value.focus();
+                formulario.reset('current_password');
+                if (entradaSenhaAtual.value instanceof HTMLInputElement) {
+                    entradaSenhaAtual.value.focus();
                 }
             }
         },
@@ -58,40 +58,40 @@ const updatePassword = () => {
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbItems">
+    <AppLayout :migalhasNavegacao="migalhasNavegacao">
         <Head title="Profile settings" />
 
         <SettingsLayout>
             <div class="space-y-6">
-                <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                <TituloPequeno title="Update password" description="Ensure your account is using a long, random password to stay secure" />
 
-                <form @submit.prevent="updatePassword" class="space-y-6">
+                <form @submit.prevent="atualizarSenha" class="space-y-6">
                     <div class="grid gap-2">
                         <Label for="current_password">Current Password</Label>
                         <Input
                             id="current_password"
-                            ref="currentPasswordInput"
-                            v-model="form.current_password"
+                            ref="entradaSenhaAtual"
+                            v-model="formulario.current_password"
                             type="password"
                             class="mt-1 block w-full"
                             autocomplete="current-password"
                             placeholder="Current password"
                         />
-                        <InputError :message="form.errors.current_password" />
+                        <ErroEntrada :message="formulario.errors.current_password" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="password">New password</Label>
                         <Input
                             id="password"
-                            ref="passwordInput"
-                            v-model="form.password"
+                            ref="entradaSenha"
+                            v-model="formulario.password"
                             type="password"
                             class="mt-1 block w-full"
                             autocomplete="new-password"
                             placeholder="New password"
                         />
-                        <InputError :message="form.errors.password" />
+                        <ErroEntrada :message="formulario.errors.password" />
                     </div>
 
                     <div class="grid gap-2">
@@ -104,14 +104,14 @@ const updatePassword = () => {
                             autocomplete="new-password"
                             placeholder="Confirm password"
                         />
-                        <InputError :message="form.errors.password_confirmation" />
+                        <ErroEntrada :message="formulario.errors.password_confirmation" />
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button :disabled="form.processing">Save password</Button>
+                        <Button :disabled="formulario.processing">Save password</Button>
 
                         <TransitionRoot
-                            :show="form.recentlySuccessful"
+                            :show="formulario.recentlySuccessful"
                             enter="transition ease-in-out"
                             enter-from="opacity-0"
                             leave="transition ease-in-out"

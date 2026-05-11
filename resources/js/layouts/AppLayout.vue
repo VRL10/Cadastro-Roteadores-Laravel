@@ -3,16 +3,16 @@ import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { BreadcrumbItemType } from '@/types';
 
 interface Props {
-    breadcrumbs?: BreadcrumbItemType[];
+    migalhasNavegacao?: BreadcrumbItemType[];
 }
 
 withDefaults(defineProps<Props>(), {
-    breadcrumbs: () => [],
+    migalhasNavegacao: () => [],
 });
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbs">
+    <AppLayout :migalhasNavegacao="migalhasNavegacao">
         <slot />
     </AppLayout>
 </template>

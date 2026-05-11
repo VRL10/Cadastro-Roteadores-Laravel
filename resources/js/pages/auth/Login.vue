@@ -5,37 +5,40 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthBase from '@/layouts/AuthLayout.vue';
+import LayoutAutenticacao from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import { computed } from 'vue';
 
-defineProps<{
+const propriedades = defineProps<{
     status?: string;
     canResetPassword: boolean;
 }>();
 
-const form = useForm({
+const situacao = computed(() => propriedades.status);
+
+const formulario = useForm({
     email: '',
     password: '',
     remember: false,
 });
 
-const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
+const enviarFormulario = () => {
+    formulario.post(route('login'), {
+        onFinish: () => formulario.reset('password'),
     });
 };
 </script>
 
 <template>
-    <AuthBase title="Log in to your account" description="Enter your email and password below to log in">
+    <LayoutAutenticacao title="Log in to your account" description="Enter your email and password below to log in">
         <Head title="Log in" />
 
-        <div v-if="status" class="mb-4 text-center text-sm font-medium text-green-600">
-            {{ status }}
+        <div v-if="situacao" class="mb-4 text-center text-sm font-medium text-green-600">
+            {{ situacao }}
         </div>
 
-        <form @submit.prevent="submit" class="flex flex-col gap-6">
+        <form @submit.prevent="enviarFormulario" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="email">Email address</Label>
@@ -46,16 +49,16 @@ const submit = () => {
                         autofocus
                         tabindex="1"
                         autocomplete="email"
-                        v-model="form.email"
+                        v-model="formulario.email"
                         placeholder="email@example.com"
                     />
-                    <InputError :message="form.errors.email" />
+                    <ErroEntrada :message="formulario.errors.email" />
                 </div>
 
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
                         <Label for="password">Password</Label>
-                        <TextLink v-if="canResetPassword" :href="route('password.request')" class="text-sm" tabindex="5"> Forgot password? </TextLink>
+                        <LinkTexto v-if="canResetPassword" :href="route('password.request')" class="text-sm" tabindex="5"> Forgot password? </LinkTexto>
                     </div>
                     <Input
                         id="password"
@@ -63,29 +66,29 @@ const submit = () => {
                         required
                         tabindex="2"
                         autocomplete="current-password"
-                        v-model="form.password"
+                        v-model="formulario.password"
                         placeholder="Password"
                     />
-                    <InputError :message="form.errors.password" />
+                    <ErroEntrada :message="formulario.errors.password" />
                 </div>
 
                 <div class="flex items-center justify-between" tabindex="3">
                     <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" v-model:checked="form.remember" tabindex="4" />
+                        <Checkbox id="remember" v-model:checked="formulario.remember" tabindex="4" />
                         <span>Remember me</span>
                     </Label>
                 </div>
 
-                <Button type="submit" class="mt-4 w-full" tabindex="4" :disabled="form.processing">
-                    <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
+                    <Button type="submit" class="mt-4 w-full" tabindex="4" :disabled="formulario.processing">
+                        <LoaderCircle v-if="formulario.processing" class="h-4 w-4 animate-spin" />
                     Log in
                 </Button>
             </div>
 
             <div class="text-center text-sm text-muted-foreground">
                 Don't have an account?
-                <TextLink :href="route('register')" :tabindex="5">Sign up</TextLink>
+                <LinkTexto :href="route('register')" :tabindex="5">Sign up</LinkTexto>
             </div>
         </form>
-    </AuthBase>
+    </LayoutAutenticacao>
 </template>

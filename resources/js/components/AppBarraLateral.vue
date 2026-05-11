@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
 import AppLogotipo from './AppLogotipo.vue';
 
-const mainNavItems: NavItem[] = [
+const itensNavegacaoPrincipal: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
@@ -16,7 +16,7 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
+const itensNavegacaoRodape: NavItem[] = [
     {
         title: 'Github Repo',
         href: 'https://github.com/laravel/vue-starter-kit',
@@ -37,7 +37,7 @@ const footerNavItems: NavItem[] = [
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
                         <Link :href="route('dashboard')">
-                            <AppLogo />
+                            <AppLogotipo />
                         </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -45,12 +45,12 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavPrincipal :items="mainNavItems" />
+            <NavPrincipal :itens="itensNavegacaoPrincipal" />
         </SidebarContent>
 
         <SidebarFooter>
-            <NavRodapé :items="footerNavItems" />
-            <NavUsuário />
+            <NavRodape :items="itensNavegacaoRodape" />
+            <NavUsuario />
         </SidebarFooter>
     </Sidebar>
     <slot />

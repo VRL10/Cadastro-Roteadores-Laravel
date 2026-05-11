@@ -26,21 +26,21 @@ interface NavItem {
 }
 
 // ===== PROPRIEDADES DO COMPONENTE =====
-// Este componente recebe uma lista de items (vem de AppSidebar como mainNavItems)
+// Este componente recebe uma lista de itens (vem de AppBarraLateral como itensNavegacaoPrincipal)
 defineProps<{
-    items: NavItem[];
+    itens: NavItem[];
 }>();
 
 // Pega a página atual para saber qual menu item está ativo
-const page = usePage<SharedData>();
+const pagina = usePage<SharedData>();
 </script>
 
 <template>
     <SidebarGroup class="px-2 py-0">
         <SidebarGroupLabel>Platform</SidebarGroupLabel>
         <SidebarMenu>
-            <SidebarMenuItem v-for="item in items" :key="item.title">
-                <SidebarMenuButton as-child :is-active="item.url === page.url">
+            <SidebarMenuItem v-for="item in itens" :key="item.title">
+                <SidebarMenuButton as-child :is-active="item.url === pagina.url">
                     <Link :href="item.url">
                         <component :is="item.icon" />
                         <span>{{ item.title }}</span>

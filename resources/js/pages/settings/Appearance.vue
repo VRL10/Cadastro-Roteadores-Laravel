@@ -8,7 +8,7 @@ import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 
-const breadcrumbItems: BreadcrumbItem[] = [
+const migalhasNavegacao: BreadcrumbItem[] = [
     {
         title: 'Appearance settings',
         href: '/settings/appearance',
@@ -17,7 +17,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbItems">
+    <AppLayout :migalhasNavegacao="migalhasNavegacao">
         <Head title="Appearance settings" />
 
         <SettingsLayout>

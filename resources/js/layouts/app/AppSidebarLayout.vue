@@ -6,11 +6,11 @@ import AppCabecalhoBarraLateral from '@/components/AppCabecalhoBarraLateral.vue'
 import type { BreadcrumbItemType } from '@/types';
 
 interface Props {
-    breadcrumbs?: BreadcrumbItemType[];
+    migalhasNavegacao?: BreadcrumbItemType[];
 }
 
 withDefaults(defineProps<Props>(), {
-    breadcrumbs: () => [],
+    migalhasNavegacao: () => [],
 });
 </script>
 
@@ -18,7 +18,7 @@ withDefaults(defineProps<Props>(), {
     <AppShell variant="sidebar">
         <AppBarraLateral />
         <AppConteudo variant="sidebar">
-            <AppCabecalhoBarraLateral :breadcrumbs="breadcrumbs" />
+            <AppCabecalhoBarraLateral :migalhasNavegacao="migalhasNavegacao" />
             <slot />
         </AppConteudo>
     </AppShell>

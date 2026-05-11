@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppÍconeLogotipo from '@/components/AppÍconeLogotipo.vue';
+import AppIconeLogotipo from '@/components/AppIconeLogotipo.vue';
 import { Link } from '@inertiajs/vue3';
 
 defineProps<{
@@ -15,7 +15,7 @@ defineProps<{
                 <div class="flex flex-col items-center gap-4">
                     <Link :href="route('home')" class="flex flex-col items-center gap-2 font-medium">
                         <div class="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                            <AppLogoIcon class="size-9 fill-current text-[var(--foreground)] dark:text-white" />
+                            <AppIconeLogotipo class="size-9 fill-current text-[var(--foreground)] dark:text-white" />
                         </div>
                         <span class="sr-only">{{ title }}</span>
                     </Link>

@@ -7,8 +7,8 @@ import { usePage } from '@inertiajs/vue3';
 import { ChevronsUpDown } from 'lucide-vue-next';
 import ConteudoMenuUsuario from './ConteudoMenuUsuario.vue';
 
-const page = usePage<SharedData>();
-const user = page.props.auth.user as User;
+const pagina = usePage<SharedData>();
+const usuario = pagina.props.auth.user as User;
 </script>
 
 <template>
@@ -24,7 +24,7 @@ const user = page.props.auth.user as User;
                     <!-- data-[state=open]:... muda a cor quando está aberto -->
                     <SidebarMenuButton size="lg" class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                         <!-- UserInfo é nosso componente que mostra nome e email -->
-                        <UserInfo :user="user" />
+                        <InfoUsuario :user="usuario" />
                         <!-- Ícone que mostra setas para cima/baixo (feedback de que é clicável) -->
                         <ChevronsUpDown class="ml-auto size-4" />
                     </SidebarMenuButton>
@@ -35,7 +35,7 @@ const user = page.props.auth.user as User;
                 <!-- align="end" alinha à direita -->
                 <DropdownMenuContent class="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" side="bottom" align="end" :side-offset="4">
                     <!-- UserMenuContent é nosso componente com as opções (logout, configurações, etc) -->
-                    <UserMenuContent :user="user" />
+                    <ConteudoMenuUsuario :user="usuario" />
                 </DropdownMenuContent>
             </DropdownMenu>
         </SidebarMenuItem>

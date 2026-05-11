@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import AppÍconeLogotipo from '@/components/AppÍconeLogotipo.vue';
+import AppIconeLogotipo from '@/components/AppIconeLogotipo.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
-const page = usePage();
-const name = page.props.name;
-const quote = page.props.quote;
+const pagina = usePage();
+const nome = pagina.props.name;
+const citacao = pagina.props.quote;
 
 defineProps<{
     title?: string;
@@ -17,13 +17,13 @@ defineProps<{
         <div class="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
             <div class="absolute inset-0 bg-zinc-900" />
             <Link :href="route('home')" class="relative z-20 flex items-center text-lg font-medium">
-                <AppLogoIcon class="mr-2 size-8 fill-current text-white" />
-                {{ name }}
+                <AppIconeLogotipo class="mr-2 size-8 fill-current text-white" />
+                {{ nome }}
             </Link>
-            <div v-if="quote" class="relative z-20 mt-auto">
+            <div v-if="citacao" class="relative z-20 mt-auto">
                 <blockquote class="space-y-2">
-                    <p class="text-lg">&ldquo;{{ quote.message }}&rdquo;</p>
-                    <footer class="text-sm text-neutral-300">{{ quote.author }}</footer>
+                    <p class="text-lg">&ldquo;{{ citacao.message }}&rdquo;</p>
+                    <footer class="text-sm text-neutral-300">{{ citacao.author }}</footer>
                 </blockquote>
             </div>
         </div>

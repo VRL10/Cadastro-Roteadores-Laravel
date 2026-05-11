@@ -5,17 +5,17 @@ import AppShell from '@/components/AppShell.vue';
 import type { BreadcrumbItemType } from '@/types';
 
 interface Props {
-    breadcrumbs?: BreadcrumbItemType[];
+    migalhasNavegacao?: BreadcrumbItemType[];
 }
 
 withDefaults(defineProps<Props>(), {
-    breadcrumbs: () => [],
+    migalhasNavegacao: () => [],
 });
 </script>
 
 <template>
     <AppShell class="flex-col">
-        <AppCabecalho :breadcrumbs="breadcrumbs" />
+        <AppCabecalho :migalhasNavegacao="migalhasNavegacao" />
         <AppConteudo>
             <slot />
         </AppConteudo>

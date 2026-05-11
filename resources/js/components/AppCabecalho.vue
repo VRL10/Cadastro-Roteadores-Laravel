@@ -21,7 +21,10 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 // Tooltip: balãozinho que aparece quando passa o mouse (vem de ui/tooltip)
 // Tem 3 partes: Provedor (context), Gatilho (trigger), e Conteúdo
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import Tooltip from '@/components/tooltip/Tooltip.vue';
+import TooltipContent from '@/components/tooltip/TooltipContent.vue';
+import TooltipProvider from '@/components/tooltip/TooltipProvider.vue';
+import TooltipTrigger from '@/components/tooltip/TooltipTrigger.vue';
 
 // Importa o menu de usuário que criamos (componente próprio)
 import ConteudoMenuUsuario from '@/components/ConteudoMenuUsuario.vue';
@@ -45,38 +48,38 @@ import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 // ===== DEFINIÇÃO DE PROPRIEDADES =====
-// Este componente pode receber "breadcrumbs" (o caminho de navegação tipo: Dashboard > Usuários > João)
+// Este componente pode receber "migalhasNavegacao" (o caminho de navegação tipo: Dashboard > Usuários > João)
 interface Props {
-    breadcrumbs?: BreadcrumbItem[];
+    migalhasNavegacao?: BreadcrumbItem[];
 }
 
 // Usa as propriedades e define um valor padrão (array vazio se não passar nada)
-const props = withDefaults(defineProps<Props>(), {
-    breadcrumbs: () => [],
+const propriedades = withDefaults(defineProps<Props>(), {
+    migalhasNavegacao: () => [],
 });
 
 // ===== LÓGICA DO COMPONENTE =====
 // Pega a página atual do Inertia.js
-const page = usePage();
+const pagina = usePage();
 
 // Extrai os dados de autenticação (dados do usuário logado)
 // Se vem do servidor Laravel, pega as informações que lá foram definidas
-const auth = computed(() => page.props.auth);
+const autenticacao = computed(() => pagina.props.auth);
 
 // Função que verifica se uma rota/URL é a atual
 // Usa isso para saber qual menu item deve ficar destacado
-const isCurrentRoute = (url: string) => {
-    return page.url === url;
+const rotaAtual = (url: string) => {
+    return pagina.url === url;
 };
 
 // Cria um estilo computado que muda conforme qual página o usuário está
 // Se está na página do Dashboard, o botão Dashboard fica com cor diferente
 // Isso dá feedback visual de "você está aqui"
-const activeItemStyles = computed(() => (url: string) => (isCurrentRoute(url) ? 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100' : ''));
+const estilosItemAtivo = computed(() => (url: string) => (rotaAtual(url) ? 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100' : ''));
 
 // ===== DADOS DOS MENUS =====
 // Lista de links principais do menu (na frente é só Dashboard, mas pode adicionar mais)
-const mainNavItems: NavItem[] = [
+const itensNavegacaoPrincipal: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
@@ -85,7 +88,7 @@ const mainNavItems: NavItem[] = [
 ];
 
 // Lista de links que ficam à direita (para repositório e documentação)
-const rightNavItems: NavItem[] = [
+const itensNavegacaoDireita: NavItem[] = [
     {
         title: 'Repository',
         href: 'https://github.com/laravel/vue-starter-kit',
@@ -127,17 +130,17 @@ const rightNavItems: NavItem[] = [
                                 <AppLogoIcon class="size-6 fill-current text-black dark:text-white" />
                             </SheetHeader>
                             
-                            <!-- Menu com os links do dashboard (vem de mainNavItems lá em cima) -->
+                                <!-- Menu com os links do dashboard (vem de itensNavegacaoPrincipal lá em cima) -->
                             <div class="flex flex-col justify-between h-full space-y-4 py-6 flex-1">
                                 <nav class="-mx-3 space-y-1">
                                     <!-- Link é do Inertia.js - faz navegação sem recarregar -->
                                     <!-- A classe "activeItemStyles" destaca qual página está aberta -->
                                     <Link
-                                        v-for="item in mainNavItems"
+                                        v-for="item in itensNavegacaoPrincipal"
                                         :key="item.title"
                                         :href="item.href"
                                         class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
-                                        :class="activeItemStyles(item.href)"
+                                        :class="estilosItemAtivo(item.href)"
                                     >
                                         <!-- component é do Vue - renderiza o ícone dinamicamente -->
                                         <component v-if="item.icon" :is="item.icon" class="h-5 w-5" />
@@ -209,7 +212,7 @@ const rightNavItems: NavItem[] = [
                         <!-- Links à direita com ícones (repositório e documentação) -->
                         <!-- Só aparece em telas grandes -->
                         <div class="hidden space-x-1 lg:flex">
-                            <template v-for="item in rightNavItems" :key="item.title">
+                                    <template v-for="item in itensNavegacaoDireita" :key="item.title">
                                 <!-- TooltipProvider vem de ui/tooltip -->
                                 <!-- Mostra um balãozinho quando passa mouse -->
                                 <TooltipProvider :delay-duration="0">
@@ -246,10 +249,10 @@ const rightNavItems: NavItem[] = [
                                 <!-- Avatar é de ui/avatar - mostra a foto do usuário -->
                                 <Avatar class="size-8 overflow-hidden rounded-full">
                                     <!-- AvatarImage mostra a foto, AvatarFallback mostra as iniciais se não tiver foto -->
-                                    <AvatarImage :src="auth.user.avatar" :alt="auth.user.name" />
+                                    <AvatarImage :src="autenticacao.user.avatar" :alt="autenticacao.user.name" />
                                     <!-- getIniciais pega as iniciais do nome (função de composables/useIniciais) -->
                                     <AvatarFallback class="rounded-lg bg-neutral-200 font-semibold text-black dark:bg-neutral-700 dark:text-white">
-                                        {{ getIniciais(auth.user?.name) }}
+                                        {{ getIniciais(autenticacao.user?.name) }}
                                     </AvatarFallback>
                                 </Avatar>
                             </Button>
@@ -259,7 +262,7 @@ const rightNavItems: NavItem[] = [
                         <DropdownMenuContent align="end" class="w-56">
                             <!-- UserMenuContent é nosso próprio componente que contém as opções do menu -->
                             <!-- Ele recebe os dados do usuário para mostrar -->
-                            <UserMenuContent :user="auth.user" />
+                            <ConteudoMenuUsuario :user="autenticacao.user" />
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -268,9 +271,9 @@ const rightNavItems: NavItem[] = [
 
         <!-- ===== BREADCRUMBS (caminho de navegação) ===== -->
         <!-- Só aparece se tem breadcrumbs (tipo: Dashboard > Usuários > João) -->
-        <div v-if="props.breadcrumbs.length > 1" class="flex w-full border-b border-sidebar-border/70">
+        <div v-if="propriedades.migalhasNavegacao.length > 1" class="flex w-full border-b border-sidebar-border/70">
             <div class="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
-                <Breadcrumbs :breadcrumbs="breadcrumbs" />
+                <Breadcrumbs :breadcrumbs="propriedades.migalhasNavegacao" />
             </div>
         </div>
     </div>

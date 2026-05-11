@@ -4,7 +4,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItemType } from '@/types';
 
 defineProps<{
-    breadcrumbs?: BreadcrumbItemType[];
+    migalhasNavegacao?: BreadcrumbItemType[];
 }>();
 </script>
 
@@ -14,12 +14,12 @@ defineProps<{
     >
         <div class="flex items-center gap-2">
             <SidebarTrigger class="-ml-1" />
-            <template v-if="breadcrumbs.length > 0">
+            <template v-if="migalhasNavegacao.length > 0">
                 <Breadcrumb>
                     <BreadcrumbList>
-                        <template v-for="(item, index) in breadcrumbs" :key="index">
+                        <template v-for="(item, index) in migalhasNavegacao" :key="index">
                             <BreadcrumbItem>
-                                <template v-if="index === breadcrumbs.length - 1">
+                                <template v-if="index === migalhasNavegacao.length - 1">
                                     <BreadcrumbPage>{{ item.title }}</BreadcrumbPage>
                                 </template>
                                 <template v-else>
@@ -28,7 +28,7 @@ defineProps<{
                                     </BreadcrumbLink>
                                 </template>
                             </BreadcrumbItem>
-                            <BreadcrumbSeparator v-if="index !== breadcrumbs.length - 1" />
+                            <BreadcrumbSeparator v-if="index !== migalhasNavegacao.length - 1" />
                         </template>
                     </BreadcrumbList>
                 </Breadcrumb>

@@ -8,7 +8,7 @@ import { ref } from 'vue';
 
 // ===== COMPONENTES IMPORTADOS =====
 // Nossos próprios componentes
-import TítuloPequeno from '@/components/TítuloPequeno.vue';
+import TituloPequeno from '@/components/TituloPequeno.vue';
 import ErroEntrada from '@/components/ErroEntrada.vue';
 
 // Componentes de ui/ (design system)
@@ -28,17 +28,17 @@ import { Label } from '@/components/ui/label';
 
 // ===== DADOS E LÓGICA DO COMPONENTE =====
 // Referência ao input de senha (para focar quando tiver erro)
-const passwordInput = ref<HTMLInputElement | null>(null);
+const entradaSenha = ref<HTMLInputElement | null>(null);
 
 // Gerenciador de formulário do Inertia.js
 // Controla o envio, validação e erros
-const form = useForm({
+const formulario = useForm({
     password: '',
 });
 
 // Função chamada quando o usuário clica "Deletar conta"
 // Faz uma requisição DELETE ao servidor para deletar a conta
-const deleteUser = (e: Event) => {
+const excluirUsuario = (e: Event) => {
     // Previne comportamento padrão do formulário
     e.preventDefault();
 
@@ -47,25 +47,25 @@ const deleteUser = (e: Event) => {
     // onSuccess: callback se conseguir deletar (fecha a modal)
     // onError: callback se tiver erro (foca no input de senha)
     // onFinish: callback sempre (limpa o formulário)
-    form.delete(route('profile.destroy'), {
+    formulario.delete(route('profile.destroy'), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
-        onError: () => passwordInput.value?.focus(),
-        onFinish: () => form.reset(),
+        onError: () => entradaSenha.value?.focus(),
+        onFinish: () => formulario.reset(),
     });
 };
 
 // Função para fechar a modal
 // Limpa erros e reseta o formulário
 const closeModal = () => {
-    form.clearErrors();
-    form.reset();
+    formulario.clearErrors();
+    formulario.reset();
 };
 </script>
 
 <template>
     <div class="space-y-6">
-        <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
+        <TituloPequeno title="Delete account" description="Delete your account and all of its resources" />
         <div class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
             <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
                 <p class="font-medium">Warning</p>
@@ -76,7 +76,7 @@ const closeModal = () => {
                     <Button variant="destructive">Delete account</Button>
                 </DialogTrigger>
                 <DialogContent>
-                    <form class="space-y-6" @submit="deleteUser">
+                    <form class="space-y-6" @submit="excluirUsuario">
                         <DialogHeader class="space-y-3">
                             <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
                             <DialogDescription>
@@ -87,8 +87,8 @@ const closeModal = () => {
 
                         <div class="grid gap-2">
                             <Label for="password" class="sr-only">Password</Label>
-                            <Input id="password" type="password" name="password" ref="passwordInput" v-model="form.password" placeholder="Password" />
-                            <InputError :message="form.errors.password" />
+                            <Input id="password" type="password" name="password" ref="entradaSenha" v-model="formulario.password" placeholder="Password" />
+                            <ErroEntrada :message="formulario.errors.password" />
                         </div>
 
                         <DialogFooter>
@@ -96,7 +96,7 @@ const closeModal = () => {
                                 <Button variant="secondary" @click="closeModal"> Cancel </Button>
                             </DialogClose>
 
-                            <Button variant="destructive" :disabled="form.processing">
+                            <Button variant="destructive" :disabled="formulario.processing">
                                 <button type="submit">Delete account</button>
                             </Button>
                         </DialogFooter>
