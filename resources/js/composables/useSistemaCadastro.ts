@@ -45,6 +45,24 @@ type Alerta = {
     tipo: 'sucesso' | 'erro' | 'aviso' | 'info';
 };
 
+function temIdValido(item: unknown): item is { id: number } {
+    if (!item || typeof item !== 'object') return false;
+
+    const valorId = (item as { id?: unknown }).id;
+    if (typeof valorId === 'number') return Number.isFinite(valorId);
+    if (typeof valorId === 'string') return valorId.trim() !== '' && Number.isFinite(Number(valorId));
+
+    return false;
+}
+
+function normalizarListaComId<T extends { id: number }>(lista: unknown): T[] {
+    if (!Array.isArray(lista)) return [];
+
+    return lista
+        .filter(temIdValido)
+        .map((item) => ({ ...(item as T), id: Number((item as { id: number | string }).id) }));
+}
+
 export function useSistemaCadastro() {
     const abaAtiva = ref<'reparticoes' | 'roteadores' | 'macs' | 'relatorios'>('reparticoes');
 
@@ -321,7 +339,8 @@ export function useSistemaCadastro() {
         carregando.reparticoes = true;
 
         try {
-            reparticoes.value = await requisicaoJson<Reparticao[]>('/api/reparticoes');
+            const dados = await requisicaoJson<unknown>('/api/reparticoes');
+            reparticoes.value = normalizarListaComId<Reparticao>(dados);
         } catch (erro) {
             mostrarAlerta('Erro', (erro as Error).message, 'erro');
         } finally {
@@ -426,7 +445,8 @@ export function useSistemaCadastro() {
 
     async function carregarComboReparticoes() {
         try {
-            combos.reparticoes = await requisicaoJson<ItemCombo[]>('/api/reparticoes/combo');
+            const dados = await requisicaoJson<unknown>('/api/reparticoes/combo');
+            combos.reparticoes = normalizarListaComId<ItemCombo>(dados);
 
             if (!formularioRoteador.reparticao_id && combos.reparticoes.length > 0) {
                 formularioRoteador.reparticao_id = String(combos.reparticoes[0].id);
@@ -440,7 +460,8 @@ export function useSistemaCadastro() {
         carregando.roteadores = true;
 
         try {
-            roteadores.value = await requisicaoJson<Roteador[]>('/api/roteadores');
+            const dados = await requisicaoJson<unknown>('/api/roteadores');
+            roteadores.value = normalizarListaComId<Roteador>(dados);
         } catch (erro) {
             mostrarAlerta('Erro', (erro as Error).message, 'erro');
         } finally {
@@ -549,7 +570,8 @@ export function useSistemaCadastro() {
 
     async function carregarComboRoteadores() {
         try {
-            combos.roteadores = await requisicaoJson<ItemCombo[]>('/api/roteadores/combo');
+            const dados = await requisicaoJson<unknown>('/api/roteadores/combo');
+            combos.roteadores = normalizarListaComId<ItemCombo>(dados);
 
             if (!formularioMac.roteador_id && combos.roteadores.length > 0) {
                 formularioMac.roteador_id = String(combos.roteadores[0].id);
@@ -568,7 +590,8 @@ export function useSistemaCadastro() {
         carregando.macs = true;
 
         try {
-            macs.value = await requisicaoJson<Mac[]>('/api/macs');
+            const dados = await requisicaoJson<unknown>('/api/macs');
+            macs.value = normalizarListaComId<Mac>(dados);
         } catch (erro) {
             mostrarAlerta('Erro', (erro as Error).message, 'erro');
         } finally {
@@ -741,6 +764,7 @@ export function useSistemaCadastro() {
     return {
         alerta,
         abaAtiva,
+        selecionado,
         carregarComboReparticoes,
         carregarComboRoteadores,
         classeAlerta,
@@ -761,11 +785,14 @@ export function useSistemaCadastro() {
         modoEdicaoRoteador,
         macsFiltrados,
         mostrarAlerta,
-        repartiricoes: reparticoes,
+        reparticoes,
         reparticoesFiltradas,
         roteadores: roteadores,
         roteadoresFiltrados,
         macs,
+        atualizarReparticoes,
+        atualizarRoteadores,
+        atualizarMacs,
         selecionarMac,
         selecionarReparticao,
         selecionarRoteador,

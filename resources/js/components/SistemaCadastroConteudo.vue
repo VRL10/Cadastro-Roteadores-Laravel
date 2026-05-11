@@ -98,17 +98,17 @@ const props = defineProps<{
                                     <td colspan="6">Nenhuma repartição cadastrada.</td>
                                 </tr>
                                 <tr
-                                    v-for="item in props.sistema.reparticoesFiltradas"
-                                    :key="item.id"
-                                    :class="{ selecionada: props.sistema.selecionado.reparticao?.id === item.id }"
-                                    @click="props.sistema.selecionarReparticao(item)"
+                                    v-for="(item, index) in props.sistema.reparticoesFiltradas"
+                                    :key="item?.id ?? index"
+                                    :class="{ selecionada: props.sistema.selecionado.reparticao?.id === item?.id }"
+                                    @click="item && props.sistema.selecionarReparticao(item)"
                                 >
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.nome_contato }}</td>
-                                    <td>{{ item.nome_reparticao }}</td>
-                                    <td>{{ item.telefone }}</td>
-                                    <td>{{ item.endereco }}</td>
-                                    <td>{{ item.observacoes || '' }}</td>
+                                    <td>{{ item?.id ?? '' }}</td>
+                                    <td>{{ item?.nome_contato ?? '' }}</td>
+                                    <td>{{ item?.nome_reparticao ?? '' }}</td>
+                                    <td>{{ item?.telefone ?? '' }}</td>
+                                    <td>{{ item?.endereco ?? '' }}</td>
+                                    <td>{{ item?.observacoes || '' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -143,8 +143,8 @@ const props = defineProps<{
                     <div>
                         <label>🏢 Repartição</label>
                         <select v-model="props.sistema.formularioRoteador.reparticao_id">
-                            <option v-for="item in props.sistema.combos.reparticoes" :key="item.id" :value="String(item.id)">
-                                {{ item.id }} - {{ item.nome }}
+                            <option v-for="(item, index) in props.sistema.combos.reparticoes" :key="item?.id ?? index" :value="String(item?.id ?? '')">
+                                {{ item?.id ?? '' }} - {{ item?.nome ?? '' }}
                             </option>
                         </select>
                     </div>
@@ -187,17 +187,17 @@ const props = defineProps<{
                                     <td colspan="6">Nenhum roteador cadastrado.</td>
                                 </tr>
                                 <tr
-                                    v-for="item in props.sistema.roteadoresFiltrados"
-                                    :key="item.id"
-                                    :class="{ selecionada: props.sistema.selecionado.roteador?.id === item.id }"
-                                    @click="props.sistema.selecionarRoteador(item)"
+                                    v-for="(item, index) in props.sistema.roteadoresFiltrados"
+                                    :key="item?.id ?? index"
+                                    :class="{ selecionada: props.sistema.selecionado.roteador?.id === item?.id }"
+                                    @click="item && props.sistema.selecionarRoteador(item)"
                                 >
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.ip_roteador }}</td>
-                                    <td>{{ item.local_roteador }}</td>
-                                    <td>{{ item.usuario }}</td>
-                                    <td>{{ item.nome_reparticao || '-' }}</td>
-                                    <td>{{ item.senha }}</td>
+                                    <td>{{ item?.id ?? '' }}</td>
+                                    <td>{{ item?.ip_roteador ?? '' }}</td>
+                                    <td>{{ item?.local_roteador ?? '' }}</td>
+                                    <td>{{ item?.usuario ?? '' }}</td>
+                                    <td>{{ item?.nome_reparticao || '-' }}</td>
+                                    <td>{{ item?.senha ?? '' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -229,8 +229,8 @@ const props = defineProps<{
                     <div>
                         <label>📡 Roteador</label>
                         <select v-model="props.sistema.formularioMac.roteador_id">
-                            <option v-for="item in props.sistema.combos.roteadores" :key="item.id" :value="String(item.id)">
-                                {{ item.id }} - {{ item.ip }} ({{ item.reparticao || '-' }})
+                            <option v-for="(item, index) in props.sistema.combos.roteadores" :key="item?.id ?? index" :value="String(item?.id ?? '')">
+                                {{ item?.id ?? '' }} - {{ item?.ip ?? '' }} ({{ item?.reparticao || '-' }})
                             </option>
                         </select>
                     </div>
@@ -275,19 +275,19 @@ const props = defineProps<{
                                     <td colspan="8">Nenhum MAC cadastrado.</td>
                                 </tr>
                                 <tr
-                                    v-for="item in props.sistema.macsFiltrados"
-                                    :key="item.id"
-                                    :class="{ selecionada: props.sistema.selecionado.mac?.id === item.id }"
-                                    @click="props.sistema.selecionarMac(item)"
+                                    v-for="(item, index) in props.sistema.macsFiltrados"
+                                    :key="item?.id ?? index"
+                                    :class="{ selecionada: props.sistema.selecionado.mac?.id === item?.id }"
+                                    @click="item && props.sistema.selecionarMac(item)"
                                 >
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.mac_address }}</td>
-                                    <td>{{ item.nome_usuario }}</td>
-                                    <td>{{ item.funcao_usuario || '' }}</td>
-                                    <td>{{ item.dispositivo || '' }}</td>
-                                    <td>{{ item.data_cadastro }}</td>
-                                    <td>{{ item.ip_roteador || '-' }}</td>
-                                    <td>{{ item.nome_reparticao || '-' }}</td>
+                                    <td>{{ item?.id ?? '' }}</td>
+                                    <td>{{ item?.mac_address ?? '' }}</td>
+                                    <td>{{ item?.nome_usuario ?? '' }}</td>
+                                    <td>{{ item?.funcao_usuario || '' }}</td>
+                                    <td>{{ item?.dispositivo || '' }}</td>
+                                    <td>{{ item?.data_cadastro ?? '' }}</td>
+                                    <td>{{ item?.ip_roteador || '-' }}</td>
+                                    <td>{{ item?.nome_reparticao || '-' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -307,8 +307,8 @@ const props = defineProps<{
                         <div class="rg-relatorio-box">
                             <h4>📡 Roteador Específico</h4>
                             <select v-model="props.sistema.ipRelatorioSelecionado">
-                                <option v-for="item in props.sistema.combos.roteadores" :key="item.id" :value="item.ip">
-                                    {{ item.ip }} - {{ item.reparticao || '-' }}
+                                <option v-for="(item, index) in props.sistema.combos.roteadores" :key="item?.id ?? index" :value="item?.ip ?? ''">
+                                    {{ item?.ip ?? '' }} - {{ item?.reparticao || '-' }}
                                 </option>
                             </select>
                             <button class="btn-primario" @click="props.sistema.gerarRelatorioRoteadorPdf">PDF</button>
