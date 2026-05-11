@@ -2,9 +2,9 @@
 import { TransitionRoot } from '@headlessui/vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
-import DeleteUser from '@/components/DeleteUser.vue';
-import HeadingSmall from '@/components/HeadingSmall.vue';
-import InputError from '@/components/InputError.vue';
+import ExcluirUsuario from '@/components/ExcluirUsuario.vue';
+import TituloPequeno from '@/components/TituloPequeno.vue';
+import ErroEntrada from '@/components/ErroEntrada.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

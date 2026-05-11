@@ -1,10 +1,17 @@
 <script setup lang="ts">
+// Importa hook do Inertia.js para gerenciar formulários
+// useForm: gerencia submissão de formulário e erros
 import { useForm } from '@inertiajs/vue3';
+
+// Importa ref do Vue para referencías a elementos HTML
 import { ref } from 'vue';
 
-// Components
-import HeadingSmall from '@/components/HeadingSmall.vue';
-import InputError from '@/components/InputError.vue';
+// ===== COMPONENTES IMPORTADOS =====
+// Nossos próprios componentes
+import TítuloPequeno from '@/components/TítuloPequeno.vue';
+import ErroEntrada from '@/components/ErroEntrada.vue';
+
+// Componentes de ui/ (design system)
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -19,15 +26,27 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+// ===== DADOS E LÓGICA DO COMPONENTE =====
+// Referência ao input de senha (para focar quando tiver erro)
 const passwordInput = ref<HTMLInputElement | null>(null);
 
+// Gerenciador de formulário do Inertia.js
+// Controla o envio, validação e erros
 const form = useForm({
     password: '',
 });
 
+// Função chamada quando o usuário clica "Deletar conta"
+// Faz uma requisição DELETE ao servidor para deletar a conta
 const deleteUser = (e: Event) => {
+    // Previne comportamento padrão do formulário
     e.preventDefault();
 
+    // Envia requisição DELETE para a rota profile.destroy
+    // preserveScroll: mantém a posição do scroll
+    // onSuccess: callback se conseguir deletar (fecha a modal)
+    // onError: callback se tiver erro (foca no input de senha)
+    // onFinish: callback sempre (limpa o formulário)
     form.delete(route('profile.destroy'), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
@@ -36,6 +55,8 @@ const deleteUser = (e: Event) => {
     });
 };
 
+// Função para fechar a modal
+// Limpa erros e reseta o formulário
 const closeModal = () => {
     form.clearErrors();
     form.reset();

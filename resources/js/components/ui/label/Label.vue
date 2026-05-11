@@ -7,7 +7,6 @@ const props = defineProps<LabelProps & { class?: HTMLAttributes['class'] }>();
 
 const delegatedProps = computed(() => {
     const { class: _, ...delegated } = props;
-
     return delegated;
 });
 </script>

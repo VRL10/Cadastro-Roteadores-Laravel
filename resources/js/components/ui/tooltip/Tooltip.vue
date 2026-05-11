@@ -3,7 +3,6 @@ import { TooltipRoot, useForwardPropsEmits, type TooltipRootEmits, type TooltipR
 
 const props = defineProps<TooltipRootProps>();
 const emits = defineEmits<TooltipRootEmits>();
-
 const forwarded = useForwardPropsEmits(props, emits);
 </script>
 

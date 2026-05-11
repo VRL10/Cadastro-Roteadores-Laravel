@@ -10,6 +10,7 @@ defineProps<Props>();
 
 const isOpen = ref(true);
 
+// Recupera preferência de barra lateral do localStorage
 onMounted(() => {
     isOpen.value = localStorage.getItem('sidebar') !== 'false';
 });
@@ -24,6 +25,7 @@ const handleSidebarChange = (open: boolean) => {
     <div v-if="variant === 'header'" class="flex min-h-screen w-full flex-col">
         <slot />
     </div>
+    <!-- Barra lateral gerenciada pelo SidebarProvider -->
     <SidebarProvider v-else :default-open="isOpen" :open="isOpen" @update:open="handleSidebarChange">
         <slot />
     </SidebarProvider>

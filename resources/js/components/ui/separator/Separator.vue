@@ -7,7 +7,6 @@ const props = defineProps<SeparatorProps & { class?: HTMLAttributes['class']; la
 
 const delegatedProps = computed(() => {
     const { class: _, ...delegated } = props;
-
     return delegated;
 });
 </script>

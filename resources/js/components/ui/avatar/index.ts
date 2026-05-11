@@ -1,9 +1,11 @@
+// Importa cva (class-variance-authority) para criar variações de estilos
 import { cva, type VariantProps } from 'class-variance-authority';
 
 export { default as Avatar } from './Avatar.vue';
 export { default as AvatarFallback } from './AvatarFallback.vue';
 export { default as AvatarImage } from './AvatarImage.vue';
 
+// ===== DEFINIÇÃO DE ESTILOS DO AVATAR =====
 export const avatarVariant = cva(
     'inline-flex items-center justify-center font-normal text-foreground select-none shrink-0 bg-secondary overflow-hidden',
     {

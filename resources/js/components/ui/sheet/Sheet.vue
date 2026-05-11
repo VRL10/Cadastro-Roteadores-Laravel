@@ -3,7 +3,6 @@ import { DialogRoot, useForwardPropsEmits, type DialogRootEmits, type DialogRoot
 
 const props = defineProps<DialogRootProps>();
 const emits = defineEmits<DialogRootEmits>();
-
 const forwarded = useForwardPropsEmits(props, emits);
 </script>
 

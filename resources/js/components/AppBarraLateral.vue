@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import NavFooter from '@/components/NavFooter.vue';
-import NavMain from '@/components/NavMain.vue';
-import NavUser from '@/components/NavUser.vue';
+import NavRodape from '@/components/NavRodape.vue';
+import NavPrincipal from '@/components/NavPrincipal.vue';
+import NavUsuario from '@/components/NavUsuario.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
-import AppLogo from './AppLogo.vue';
+import AppLogotipo from './AppLogotipo.vue';
 
 const mainNavItems: NavItem[] = [
     {
@@ -45,12 +45,12 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavPrincipal :items="mainNavItems" />
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
-            <NavUser />
+            <NavRodapé :items="footerNavItems" />
+            <NavUsuário />
         </SidebarFooter>
     </Sidebar>
     <slot />

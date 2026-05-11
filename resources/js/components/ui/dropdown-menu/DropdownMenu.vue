@@ -3,7 +3,6 @@ import { DropdownMenuRoot, useForwardPropsEmits, type DropdownMenuRootEmits, typ
 
 const props = defineProps<DropdownMenuRootProps>();
 const emits = defineEmits<DropdownMenuRootEmits>();
-
 const forwarded = useForwardPropsEmits(props, emits);
 </script>
 

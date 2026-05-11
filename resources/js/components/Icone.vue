@@ -17,8 +17,8 @@ const props = withDefaults(defineProps<Props>(), {
     strokeWidth: 2,
 });
 
+// Busca ícone pela name capitalizando primeiro caractere
 const className = computed(() => cn('h-4 w-4', props.class));
-
 const icon = computed(() => {
     const iconName = props.name.charAt(0).toUpperCase() + props.name.slice(1);
     return (icons as Record<string, any>)[iconName];
@@ -26,5 +26,7 @@ const icon = computed(() => {
 </script>
 
 <template>
+    <!-- component renderiza o ícone dinamicamente (não sabe qual será na frente) -->
+    <!-- Passa os props: tamanho, cor, espessura da linha, etc -->
     <component :is="icon" :class="className" :size="size" :stroke-width="strokeWidth" :color="color" />
 </template>
