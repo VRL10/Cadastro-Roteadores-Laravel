@@ -11,7 +11,7 @@ const props = defineProps<{
         <!-- Cabecalho principal da pagina -->
         <div class="rg-cabecalho">
             <div class="rg-cabecalho-gradiente">
-                <h1>🏢 Sistema de Cadastro - Repartições e Roteadores</h1>
+                <h1>&#x1F3E2; Sistema de Cadastro - Repartições e Roteadores</h1>
             </div>
         </div>
 
@@ -22,35 +22,35 @@ const props = defineProps<{
             </div>
 
             <nav class="rg-abas" aria-label="Navegação principal">
-                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'reparticoes' }" @click="props.sistema.trocarAba('reparticoes')">🏢 Repartições</button>
-                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'roteadores' }" @click="props.sistema.trocarAba('roteadores')">📡 Roteadores</button>
-                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'macs' }" @click="props.sistema.trocarAba('macs')">🔗 MAC Addresses</button>
-                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'relatorios' }" @click="props.sistema.trocarAba('relatorios')">📊 Relatórios</button>
+                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'reparticoes' }" @click="props.sistema.trocarAba('reparticoes')">&#x1F3E2; Repartições</button>
+                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'roteadores' }" @click="props.sistema.trocarAba('roteadores')">&#x1F4E1; Roteadores</button>
+                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'macs' }" @click="props.sistema.trocarAba('macs')">&#x1F517; MAC Addresses</button>
+                <button class="rg-aba" :class="{ ativo: props.sistema.abaAtiva === 'relatorios' }" @click="props.sistema.trocarAba('relatorios')">&#x1F4CA; Relatórios</button>
             </nav>
 
             <section v-show="props.sistema.abaAtiva === 'reparticoes'" class="rg-painel">
                 <div class="rg-card rg-card-form">
-                    <h3>📝 Cadastrar/Editar Repartição</h3>
+                    <h3>&#x1F4DD; Cadastrar/Editar Repartição</h3>
                     <div class="rg-grid-2">
                         <div>
-                            <label>👤 Nome do Contato</label>
+                            <label>&#x1F464; Nome do Contato</label>
                             <input v-model="props.sistema.formularioReparticao.nome_contato" type="text" />
                         </div>
                         <div>
-                            <label>🏢 Nome da Repartição</label>
+                            <label>&#x1F3E2; Nome da Repartição</label>
                             <input v-model="props.sistema.formularioReparticao.nome_reparticao" type="text" />
                         </div>
                         <div>
-                            <label>📞 Telefone</label>
+                            <label>&#x1F4DE; Telefone</label>
                             <input v-model="props.sistema.formularioReparticao.telefone" type="text" placeholder="(11) 99999-9999" @input="props.sistema.aoDigitarTelefone" />
                         </div>
                         <div>
-                            <label>📍 Endereço</label>
+                            <label>&#x1F4CD; Endereço</label>
                             <input v-model="props.sistema.formularioReparticao.endereco" type="text" />
                         </div>
                     </div>
                     <div>
-                        <label>📝 Observações</label>
+                        <label>&#x1F4DD; Observações</label>
                         <textarea
                             ref="props.sistema.campoObservacoesRef"
                             v-model="props.sistema.formularioReparticao.observacoes"
@@ -60,27 +60,27 @@ const props = defineProps<{
                         ></textarea>
                     </div>
                     <div class="rg-acoes">
-                        <button class="btn-sucesso" @click="props.sistema.salvarReparticao">💾 {{ props.sistema.modoEdicaoReparticao ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
-                        <button class="btn-aviso" @click="props.sistema.editarReparticao">✏️ EDITAR</button>
-                        <button class="btn-erro" @click="props.sistema.excluirReparticao">🗑️ EXCLUIR</button>
-                        <button class="btn-info" @click="props.sistema.atualizarReparticoes">🔄 ATUALIZAR</button>
-                        <button class="btn-secundario" @click="props.sistema.limparFormularioReparticao">🧹 LIMPAR</button>
+                        <button class="btn-sucesso" @click="props.sistema.salvarReparticao">&#x1F4BE; {{ props.sistema.modoEdicaoReparticao ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
+                        <button class="btn-aviso" @click="props.sistema.editarReparticao">&#x270F;&#xFE0F; EDITAR</button>
+                        <button class="btn-erro" @click="props.sistema.excluirReparticao">&#x1F5D1;&#xFE0F; EXCLUIR</button>
+                        <button class="btn-info" @click="props.sistema.atualizarReparticoes">&#x1F504; ATUALIZAR</button>
+                        <button class="btn-secundario" @click="props.sistema.limparFormularioReparticao">&#x1F9F9; LIMPAR</button>
                     </div>
                 </div>
 
                 <div class="rg-card rg-card-filtro">
-                    <h3>🔍 Filtro</h3>
+                    <h3>&#x1F50D; Filtro</h3>
                     <div class="rg-grid-filtro">
                         <input v-model="props.sistema.filtros.reparticoes" type="text" placeholder="Buscar por contato, repartição, telefone..." @keyup.enter="props.sistema.aplicarFiltroReparticoes" />
                         <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="props.sistema.aplicarFiltroReparticoes">🔍 Aplicar Filtro</button>
-                            <button class="btn-secundario" @click="() => { props.sistema.filtros.reparticoes = ''; props.sistema.atualizarReparticoes(); }">🗑️ Limpar Filtro</button>
+                            <button class="btn-primario" @click="props.sistema.aplicarFiltroReparticoes">&#x1F50D; Aplicar Filtro</button>
+                            <button class="btn-secundario" @click="() => { props.sistema.filtros.reparticoes = ''; props.sistema.atualizarReparticoes(); }">&#x1F5D1;&#xFE0F; Limpar Filtro</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="rg-card rg-card-lista">
-                    <h3>📋 Repartições Cadastradas</h3>
+                    <h3>&#x1F4CB; Repartições Cadastradas</h3>
                     <div class="rg-tabela-wrap">
                         <table class="rg-tabela rg-tabela-reparticoes">
                             <thead>
@@ -118,22 +118,22 @@ const props = defineProps<{
 
             <section v-show="props.sistema.abaAtiva === 'roteadores'" class="rg-painel">
                 <div class="rg-card rg-card-form">
-                    <h3>📝 Cadastrar/Editar Roteador</h3>
+                    <h3>&#x1F4DD; Cadastrar/Editar Roteador</h3>
                     <div class="rg-grid-2">
                         <div>
-                            <label>🌐 IP do Roteador</label>
+                            <label>&#x1F310; IP do Roteador</label>
                             <input v-model="props.sistema.formularioRoteador.ip_roteador" type="text" placeholder="192.168.1.1" />
                         </div>
                         <div>
-                            <label>📍 Local do Roteador</label>
+                            <label>&#x1F4CD; Local do Roteador</label>
                             <input v-model="props.sistema.formularioRoteador.local_roteador" type="text" />
                         </div>
                         <div>
-                            <label>👤 Usuário</label>
+                            <label>&#x1F464; Usuário</label>
                             <input v-model="props.sistema.formularioRoteador.usuario" type="text" />
                         </div>
                         <div>
-                            <label>🔑 Senha</label>
+                            <label>&#x1F511; Senha</label>
                             <input v-model="props.sistema.formularioRoteador.senha" :type="props.sistema.exibirSenhaRoteador ? 'text' : 'password'" />
                             <button type="button" class="rg-botao-senha" @click="props.sistema.exibirSenhaRoteador = !props.sistema.exibirSenhaRoteador">
                                 {{ props.sistema.exibirSenhaRoteador ? 'Ocultar senha' : 'Ver senha' }}
@@ -141,7 +141,7 @@ const props = defineProps<{
                         </div>
                     </div>
                     <div>
-                        <label>🏢 Repartição</label>
+                        <label>&#x1F3E2; Repartição</label>
                         <select v-model="props.sistema.formularioRoteador.reparticao_id">
                             <option v-for="(item, index) in props.sistema.combos.reparticoes" :key="item?.id ?? index" :value="String(item?.id ?? '')">
                                 {{ item?.id ?? '' }} - {{ item?.nome ?? '' }}
@@ -149,27 +149,27 @@ const props = defineProps<{
                         </select>
                     </div>
                     <div class="rg-acoes">
-                        <button class="btn-sucesso" @click="props.sistema.salvarRoteador">💾 {{ props.sistema.modoEdicaoRoteador ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
-                        <button class="btn-aviso" @click="props.sistema.editarRoteador">✏️ EDITAR</button>
-                        <button class="btn-erro" @click="props.sistema.excluirRoteador">🗑️ EXCLUIR</button>
-                        <button class="btn-info" @click="props.sistema.atualizarRoteadores">🔄 ATUALIZAR</button>
-                        <button class="btn-secundario" @click="props.sistema.limparFormularioRoteador">🧹 LIMPAR</button>
+                        <button class="btn-sucesso" @click="props.sistema.salvarRoteador">&#x1F4BE; {{ props.sistema.modoEdicaoRoteador ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
+                        <button class="btn-aviso" @click="props.sistema.editarRoteador">&#x270F;&#xFE0F; EDITAR</button>
+                        <button class="btn-erro" @click="props.sistema.excluirRoteador">&#x1F5D1;&#xFE0F; EXCLUIR</button>
+                        <button class="btn-info" @click="props.sistema.atualizarRoteadores">&#x1F504; ATUALIZAR</button>
+                        <button class="btn-secundario" @click="props.sistema.limparFormularioRoteador">&#x1F9F9; LIMPAR</button>
                     </div>
                 </div>
 
                 <div class="rg-card rg-card-filtro">
-                    <h3>🔍 Filtro</h3>
+                    <h3>&#x1F50D; Filtro</h3>
                     <div class="rg-grid-filtro">
                         <input v-model="props.sistema.filtros.roteadores" type="text" placeholder="Buscar por IP ou local..." @keyup.enter="props.sistema.aplicarFiltroRoteadores" />
                         <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="props.sistema.aplicarFiltroRoteadores">🔍 Aplicar Filtro</button>
-                            <button class="btn-secundario" @click="() => { props.sistema.filtros.roteadores = ''; props.sistema.atualizarRoteadores(); }">🗑️ Limpar Filtro</button>
+                            <button class="btn-primario" @click="props.sistema.aplicarFiltroRoteadores">&#x1F50D; Aplicar Filtro</button>
+                            <button class="btn-secundario" @click="() => { props.sistema.filtros.roteadores = ''; props.sistema.atualizarRoteadores(); }">&#x1F5D1;&#xFE0F; Limpar Filtro</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="rg-card rg-card-lista">
-                    <h3>📋 Roteadores Cadastrados</h3>
+                    <h3>&#x1F4CB; Roteadores Cadastrados</h3>
                     <div class="rg-tabela-wrap">
                         <table class="rg-tabela rg-tabela-roteadores">
                             <thead>
@@ -207,27 +207,27 @@ const props = defineProps<{
 
             <section v-show="props.sistema.abaAtiva === 'macs'" class="rg-painel">
                 <div class="rg-card rg-card-form">
-                    <h3>📝 Cadastrar/Editar MAC Address</h3>
+                    <h3>&#x1F4DD; Cadastrar/Editar MAC Address</h3>
                     <div class="rg-grid-2">
                         <div>
-                            <label>🔗 MAC Address</label>
+                            <label>&#x1F517; MAC Address</label>
                             <input v-model="props.sistema.formularioMac.mac_address" type="text" placeholder="00:00:00:00:00:00" @input="props.sistema.aoDigitarMac" />
                         </div>
                         <div>
-                            <label>👤 Nome do Usuário</label>
+                            <label>&#x1F464; Nome do Usuário</label>
                             <input v-model="props.sistema.formularioMac.nome_usuario" type="text" />
                         </div>
                         <div>
-                            <label>💼 Função do Usuário</label>
+                            <label>&#x1F4BC; Função do Usuário</label>
                             <input v-model="props.sistema.formularioMac.funcao_usuario" type="text" />
                         </div>
                         <div>
-                            <label>💻 Dispositivo</label>
+                            <label>&#x1F4BB; Dispositivo</label>
                             <input v-model="props.sistema.formularioMac.dispositivo" type="text" />
                         </div>
                     </div>
                     <div>
-                        <label>📡 Roteador</label>
+                        <label>&#x1F4E1; Roteador</label>
                         <select v-model="props.sistema.formularioMac.roteador_id">
                             <option v-for="(item, index) in props.sistema.combos.roteadores" :key="item?.id ?? index" :value="String(item?.id ?? '')">
                                 {{ item?.id ?? '' }} - {{ item?.ip ?? '' }} ({{ item?.reparticao || '-' }})
@@ -235,27 +235,27 @@ const props = defineProps<{
                         </select>
                     </div>
                     <div class="rg-acoes">
-                        <button class="btn-sucesso" @click="props.sistema.salvarMac">💾 {{ props.sistema.modoEdicaoMac ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
-                        <button class="btn-aviso" @click="props.sistema.editarMac">✏️ EDITAR</button>
-                        <button class="btn-erro" @click="props.sistema.excluirMac">🗑️ EXCLUIR</button>
-                        <button class="btn-info" @click="props.sistema.atualizarMacs">🔄 ATUALIZAR</button>
-                        <button class="btn-secundario" @click="props.sistema.limparFormularioMac">🧹 LIMPAR</button>
+                        <button class="btn-sucesso" @click="props.sistema.salvarMac">&#x1F4BE; {{ props.sistema.modoEdicaoMac ? 'SALVAR ALTERAÇÕES' : 'SALVAR' }}</button>
+                        <button class="btn-aviso" @click="props.sistema.editarMac">&#x270F;&#xFE0F; EDITAR</button>
+                        <button class="btn-erro" @click="props.sistema.excluirMac">&#x1F5D1;&#xFE0F; EXCLUIR</button>
+                        <button class="btn-info" @click="props.sistema.atualizarMacs">&#x1F504; ATUALIZAR</button>
+                        <button class="btn-secundario" @click="props.sistema.limparFormularioMac">&#x1F9F9; LIMPAR</button>
                     </div>
                 </div>
 
                 <div class="rg-card rg-card-filtro">
-                    <h3>🔍 Filtro</h3>
+                    <h3>&#x1F50D; Filtro</h3>
                     <div class="rg-grid-filtro">
                         <input v-model="props.sistema.filtros.macs" type="text" placeholder="Buscar por MAC ou usuário..." @keyup.enter="props.sistema.aplicarFiltroMacs" />
                         <div class="rg-botoes-coluna">
-                            <button class="btn-primario" @click="props.sistema.aplicarFiltroMacs">🔍 Aplicar Filtro</button>
-                            <button class="btn-secundario" @click="() => { props.sistema.filtros.macs = ''; props.sistema.atualizarMacs(); }">🗑️ Limpar Filtro</button>
+                            <button class="btn-primario" @click="props.sistema.aplicarFiltroMacs">&#x1F50D; Aplicar Filtro</button>
+                            <button class="btn-secundario" @click="() => { props.sistema.filtros.macs = ''; props.sistema.atualizarMacs(); }">&#x1F5D1;&#xFE0F; Limpar Filtro</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="rg-card rg-card-lista">
-                    <h3>📋 MAC Addresses Cadastrados</h3>
+                    <h3>&#x1F4CB; MAC Addresses Cadastrados</h3>
                     <div class="rg-tabela-wrap">
                         <table class="rg-tabela rg-tabela-macs">
                             <thead>
@@ -297,15 +297,15 @@ const props = defineProps<{
 
             <section v-show="props.sistema.abaAtiva === 'relatorios'" class="rg-painel">
                 <div class="rg-card rg-card-form">
-                    <h3>📊 Gerar Relatórios</h3>
+                    <h3>&#x1F4CA; Gerar Relatórios</h3>
                     <div class="rg-relatorios-grid">
                         <div class="rg-relatorio-box">
-                            <h4>📋 Repartições</h4>
+                            <h4>&#x1F4CB; Repartições</h4>
                             <button class="btn-primario" @click="props.sistema.gerarRelatorioReparticoesPdf">PDF</button>
                             <button class="btn-info" @click="props.sistema.gerarRelatorioReparticoesExcel">Excel</button>
                         </div>
                         <div class="rg-relatorio-box">
-                            <h4>📡 Roteador Específico</h4>
+                            <h4>&#x1F4E1; Roteador Específico</h4>
                             <select v-model="props.sistema.ipRelatorioSelecionado">
                                 <option v-for="(item, index) in props.sistema.combos.roteadores" :key="item?.id ?? index" :value="item?.ip ?? ''">
                                     {{ item?.ip ?? '' }} - {{ item?.reparticao || '-' }}
@@ -315,7 +315,7 @@ const props = defineProps<{
                             <button class="btn-info" @click="props.sistema.gerarRelatorioRoteadorExcel">Excel</button>
                         </div>
                         <div class="rg-relatorio-box">
-                            <h4>🔗 MAC Addresses</h4>
+                            <h4>&#x1F517; MAC Addresses</h4>
                             <button class="btn-sucesso" @click="props.sistema.gerarRelatorioMacsPdf">PDF</button>
                             <button class="btn-info" @click="props.sistema.gerarRelatorioMacsExcel">Excel</button>
                         </div>
