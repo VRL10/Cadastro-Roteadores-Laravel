@@ -6,7 +6,6 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import { inicializarTema } from './composables/useAparencia';
 
 // Declaração de tipos para as variáveis de ambiente e a função glob, que são usadas no código para configurar o nome do aplicativo e resolver os componentes de página.
 declare module 'vite/client' {
@@ -41,6 +40,3 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
-
-// Define o tema claro / escuro ao carregar a página.
-inicializarTema();
