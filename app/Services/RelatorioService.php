@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RelatorioService
 {
-	public function dadosReparticoes(): Collection
-	{
+	// Listar todas as repartições, ordenadas por nome
+	public function dadosReparticoes(): Collection {
 		return Reparticao::query()->orderBy('nome_reparticao')->get();
 	}
-
+	
+	// Lista dados do MacAddress, incluindo informações do roteador e da repartição associada, com ordenação por nome de usuário
 	public function dadosMacs(): Collection
 	{
 		return MacAddress::query()
@@ -22,6 +23,7 @@ class RelatorioService
 			->get();
 	}
 
+	// Listar os roteadores, incluindo informações da repartição associada, ordenados por IP
 	public function dadosRoteadorPorIp(string $ip): ?Roteador
 	{
 		return Roteador::query()

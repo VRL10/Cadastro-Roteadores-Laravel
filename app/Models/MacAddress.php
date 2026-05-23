@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MacAddress extends Model
 {
+	// Usar a trait HasFactory para permitir a criação de fábricas de modelos
 	use HasFactory;
 
+	// Definir o nome da tabela associada a este modelo
 	protected $table = 'mac_addresses';
 
+	// Definir os campos que podem ser preenchidos em massa
 	protected $fillable = [
 		'mac_address',
 		'nome_usuario',
@@ -21,12 +24,13 @@ class MacAddress extends Model
 		'roteador_id',
 	];
 
+	// Definir os casts para os campos, garantindo que data_cadastro seja tratada como uma data formatada
 	protected $casts = [
 		'data_cadastro' => 'date:Y-m-d',
 	];
 
-	public function roteador(): BelongsTo
-	{
+	// Definir a relação de muitos para um com o modelo Roteador
+	public function roteador(): BelongsTo {
 		return $this->belongsTo(Roteador::class);
 	}
 }

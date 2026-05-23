@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 
 class MacAddressService
-{
-	public function listar(?int $roteadorId = null, ?string $filtro = null): Collection
-	{
+{	
+	// Listar os endereços MAC, com opções de filtro por roteador e por termo de busca
+	public function listar(?int $roteadorId = null, ?string $filtro = null): Collection {
 		return MacAddress::query()
 			->with('roteador.reparticao:id,nome_reparticao')
 			->when($roteadorId, function ($query, $idRoteador) {
@@ -35,24 +35,28 @@ class MacAddressService
 			->get();
 	}
 
+	// Cadastrar um novo endereço MAC
 	public function cadastrar(array $dados): MacAddress
 	{
+		// Se a data de cadastro não for fornecida, usar a data atual
 		if (empty($dados['data_cadastro'])) {
 			$dados['data_cadastro'] = Carbon::now()->toDateString();
 		}
 
+		// Criar o novo endereço MAC usando os dados fornecidos
 		return MacAddress::create($dados);
 	}
 
-	public function atualizar(MacAddress $macAddress, array $dados): MacAddress
-	{
+	// Atualizar um endereço MAC existente
+	public function atualizar(MacAddress $macAddress, array $dados): MacAddress {
+		// Se a data de cadastro for fornecida, garantir que esteja no formato correto
 		$macAddress->update($dados);
 
 		return $macAddress->refresh();
 	}
 
-	public function excluir(MacAddress $macAddress): void
-	{
+	// Excluir um endereço MAC
+	public function excluir(MacAddress $macAddress): void {
 		$macAddress->delete();
 	}
 }

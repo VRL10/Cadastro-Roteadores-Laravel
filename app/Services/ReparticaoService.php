@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ReparticaoService
 {
-	public function listar(?string $filtro = null): Collection
-	{
+	// Listar as repartições, com opção de filtro por nome do contato, nome da repartição, endereço ou telefone
+	public function listar(?string $filtro = null): Collection {
+		// Retornar as repartições, aplicando o filtro se fornecido, e ordenando por ID
 		return Reparticao::query()
 			->when($filtro, function ($query, $filtroAplicado) {
 				$query->where(function ($subquery) use ($filtroAplicado) {
@@ -23,25 +24,25 @@ class ReparticaoService
 			->get();
 	}
 
-	public function cadastrar(array $dados): Reparticao
-	{
+	// Cadastrar uma nova repartição
+	public function cadastrar(array $dados): Reparticao{
 		return Reparticao::create($dados);
 	}
 
-	public function atualizar(Reparticao $reparticao, array $dados): Reparticao
-	{
+	// Atualizar uma repartição existente
+	public function atualizar(Reparticao $reparticao, array $dados): Reparticao {
 		$reparticao->update($dados);
 
 		return $reparticao->refresh();
 	}
 
-	public function excluir(Reparticao $reparticao): void
-	{
+	// Excluir uma repartição
+	public function excluir(Reparticao $reparticao): void{
 		$reparticao->delete();
 	}
 
-	public function listarParaCombo(): Collection
-	{
+	// Listar as repartições para uso em um combo box, retornando apenas o ID e o nome da repartição
+	public function listarParaCombo(): Collection {
 		return Reparticao::query()
 			->select(['id', 'nome_reparticao as nome'])
 			->orderBy('nome_reparticao')

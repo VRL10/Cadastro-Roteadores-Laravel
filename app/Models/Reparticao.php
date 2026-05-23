@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Reparticao extends Model
 {
+	// Usar a trait HasFactory para permitir a criação de fábricas de modelos
 	use HasFactory;
 
+	// Definir o nome da tabela associada a este modelo
 	protected $table = 'reparticoes';
 
+	// Definir os campos que podem ser preenchidos em massa
 	protected $fillable = [
 		'nome_contato',
 		'nome_reparticao',
@@ -20,8 +23,8 @@ class Reparticao extends Model
 		'observacoes',
 	];
 
-	public function roteadores(): HasMany
-	{
+	// Definir a relação de um para muitos com o modelo Roteador
+	public function roteadores(): HasMany{
 		return $this->hasMany(Roteador::class);
 	}
 }
