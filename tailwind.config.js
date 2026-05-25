@@ -7,10 +7,7 @@ export default {
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
-<<<<<<< HEAD
-=======
         './resources/js/**/*.vue',
->>>>>>> 70ebf23 (Tela de login atualizada, rotas ajustadas.)
     ],
 
     theme: {
