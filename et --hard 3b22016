@@ -1,0 +1,21 @@
+[33m59a5eaf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Localização da tela de Login
+[33mc2e1afa[m Adicionada tela de Login e funcionalidades básicas de autenticação
+[33m30c1d46[m Adicionada tela de Login e funcionalidades básicas de autenticação
+[33m3b22016[m Adicionei a funcionalidade de "não permitir" com que o usuário edite o formulário de um item caso ele apenas clique. Pois ele pode acabar criando uma cópia de um item sem querer ou criando um novo item em vez de editar. A questão de edição acabou se tornando muito confusa, atrapalhando a usabilidade. Por conta disso, essa ação foi tomada. No momento, quando o usuário seleciona um item o formulário some e aparece apenas uma espaço de vizualização. Caso ele queira editar, basta apenas clicar no botão amarelo 'Editar' e o formulário de edição será aberto. Em seguida basta apenas clicar em 'Salvar Alterações'. + Também adicionei comentários em diversos arquivos com o intuito de facilitar manutenções futuras. Além disso, pode ser que o projeto tenha novas implementações.
+[33mf4d0d92[m Excluindo arquivos pré-prontos de template (starter kit), que são dividos em 3 grupos: Estrutura padrão de app, Módulo de conta do usuário, Biblioteca de UI reutilizável. Vamos tentar fazer a parte de Login e Validação de uma forma mais fácil e sem complicações.
+[33mc6a3f06[m Decidimos que o Lizzandro vai fazer a parte de Autenticação toda do zero. Por conta disso, vou excluir toda a parte que já tinha feito.
+[33m7d463e4[m Ajustei apenas o emojis do arquivo SistemaCadastroConteudo.vue
+[33md29e01b[m readme.md
+[33md955e97[m Criei a primeira parte da documentação
+[33mf6b389b[m Estou enviando as imagens referentes as telas de front end já feitas - Todas inclusive já estão com o back end concluído. Posteriormente entremos na etapa de testes para termos a garantir que todas as funcionalidades não APENAS funcionem, mas tembém se estão sendo cumpridas de forma adequada.
+[33mb2768d7[m Deixei o arquivo SistemaCadastro ( Separei a lógica pesada do controller para o service, então o arquivo ficou mais enxuto e passou a cuidar só de validar dados e devolver a resposta. Também deixei a listagem mais leve, retornando apenas os campos necessários e aplicando filtro antes de montar o JSON.
+[33me36d46d[m Deixei o arquivo SistemaCadastro ( Separei a lógica pesada do controller para o service, então o arquivo ficou mais enxuto e passou a cuidar só de validar dados e devolver a resposta. Também deixei a listagem mais leve, retornando apenas os campos necessários e aplicando filtro antes de montar o JSON.
+[33m1f27887[m Add alguns comentários para facilitar a compreenção
+[33me03bb89[m coloquei comentários
+[33m955b2b1[m Filtro automatico só funcionará a partir de 4 caracteres (ainda não funcionando 100%) + Ajuste nos formulários + responsividade concluída
+[33mfac9767[m Alterei os botões do formulario, e colquei a busca em baixo do formulario em vez de em cima.
+[33m6cb2928[m Update readme with improved asset management details
+[33m77839a1[m readme.md
+[33md257e35[m TERMO DE COPROPRIEDADE E USO LIVRE
+[33ma9c82c9[m Add files via upload
+[33m8195fbe[m Versao inicial projeto
