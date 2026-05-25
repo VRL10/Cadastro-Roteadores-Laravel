@@ -5,16 +5,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect('/SistemaCadastro');
 });
-
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/SistemaCadastro', function () {
         return Inertia::render('SistemaCadastro');
     })->name('SistemaCadastro');
 });
-
 
 Route::middleware('auth')->group(function () {
 
