@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\Roteador;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -10,7 +9,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class RoteadorDetalhadoExport implements FromCollection, ShouldAutoSize, WithHeadings
 {
-    public function __construct(private readonly Roteador $roteador) {}
+    public function __construct(private readonly object $roteador) {}
 
     public function collection(): Collection
     {

@@ -2,36 +2,48 @@
 
 namespace App\Services;
 
-use App\Models\MacAddress;
-use App\Models\Reparticao;
-use App\Models\Roteador;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class RelatorioService
 {
+	public function __construct(
+		private readonly ReparticaoService $reparticaoService,
+		private readonly RoteadorService $roteadorService,
+		private readonly MacAddressService $macAddressService,
+	) {}
+
 	// Listar todas as repartições, ordenadas por nome
 	public function dadosReparticoes(): Collection {
-		return Reparticao::query()->orderBy('nome_reparticao')->get();
+		return $this->reparticaoService->listar()->sortBy('nome_reparticao')->values();
 	}
 	
 	// Lista dados do MacAddress, incluindo informações do roteador e da repartição associada, com ordenação por nome de usuário
 	public function dadosMacs(): Collection
 	{
-		return MacAddress::query()
-			->with('roteador.reparticao:id,nome_reparticao')
-			->orderBy('nome_usuario')
-			->get();
+		return $this->macAddressService->listar()->sortBy('nome_usuario')->values();
 	}
 
 	// Listar os roteadores, incluindo informações da repartição associada, ordenados por IP
-	public function dadosRoteadorPorIp(string $ip): ?Roteador
+	public function dadosRoteadorPorIp(string $ip): object|null
 	{
-		return Roteador::query()
-			->with([
-				'reparticao',
-				'enderecosMac' => fn ($query) => $query->orderBy('nome_usuario'),
-			])
-			->where('ip_roteador', $ip)
-			->first();
+		$roteador = $this->roteadorService->buscarPorIp($ip);
+
+		if (! $roteador) {
+			return null;
+		}
+
+		$macs = $this->macAddressService->listar((int) data_get($roteador, 'id'))
+			->sortBy('nome_usuario')
+			->values();
+
+		if ($roteador instanceof \App\Models\Roteador) {
+			$roteador->setRelation('enderecosMac', $macs);
+
+			return $roteador;
+		}
+
+		$roteador->enderecosMac = $macs;
+
+		return $roteador;
 	}
 }

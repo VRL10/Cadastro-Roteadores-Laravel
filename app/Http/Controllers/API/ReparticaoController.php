@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Reparticao;
 use App\Services\ReparticaoService;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,16 +18,20 @@ class ReparticaoController extends Controller
 		// Obter o filtro de texto da query string, se fornecido
 		$filtro = trim((string) $request->query('filtro', ''));
 
-		// Listar as repartições usando o serviço, aplicando o filtro se fornecido
-		$reparticoes = $this->reparticaoService->listar($filtro !== '' ? $filtro : null);
+		try {
+			// Listar as repartições usando o serviço, aplicando o filtro se fornecido
+			$reparticoes = $this->reparticaoService->listar($filtro !== '' ? $filtro : null);
+		} catch (QueryException) {
+			return response()->json([]);
+		}
 
-		return response()->json($reparticoes->map(fn (Reparticao $reparticao) => [
-			'id' => $reparticao->id,
-			'nome_contato' => $reparticao->nome_contato,
-			'nome_reparticao' => $reparticao->nome_reparticao,
-			'telefone' => $reparticao->telefone,
-			'endereco' => $reparticao->endereco,
-			'observacoes' => $reparticao->observacoes,
+		return response()->json($reparticoes->map(fn ($reparticao) => [
+			'id' => data_get($reparticao, 'id'),
+			'nome_contato' => data_get($reparticao, 'nome_contato'),
+			'nome_reparticao' => data_get($reparticao, 'nome_reparticao'),
+			'telefone' => data_get($reparticao, 'telefone'),
+			'endereco' => data_get($reparticao, 'endereco'),
+			'observacoes' => data_get($reparticao, 'observacoes'),
 		]));
 	}
 
@@ -52,7 +56,13 @@ class ReparticaoController extends Controller
 	}
 
 	// Atualizar uma repartição existente
-	public function update(Request $request, Reparticao $reparticao): JsonResponse {
+	public function update(Request $request, string $reparticaoId): JsonResponse {
+		$reparticao = $this->reparticaoService->buscarPorId((int) $reparticaoId);
+
+		if (! $reparticao) {
+			return response()->json(['mensagem' => 'Reparticao nao encontrada.'], 404);
+		}
+
 		// Validar os dados de entrada para atualizar a repartição
 		$dados = $request->validate([
 			'nome_contato' => ['required', 'string', 'max:255'],
@@ -73,7 +83,13 @@ class ReparticaoController extends Controller
 	}
 
 	// Excluir uma repartição
-	public function destroy(Reparticao $reparticao): JsonResponse {
+	public function destroy(string $reparticaoId): JsonResponse {
+		$reparticao = $this->reparticaoService->buscarPorId((int) $reparticaoId);
+
+		if (! $reparticao) {
+			return response()->json(['mensagem' => 'Reparticao nao encontrada.'], 404);
+		}
+
 		// Excluir a repartição usando o serviço
 		$this->reparticaoService->excluir($reparticao);
 
@@ -85,6 +101,13 @@ class ReparticaoController extends Controller
 
 	// Listar as repartições para uso em combo box (id e nome_reparticao)
 	public function combo(): JsonResponse {
-		return response()->json($this->reparticaoService->listarParaCombo());
+		try {
+			return response()->json($this->reparticaoService->listarParaCombo()->map(fn ($reparticao) => [
+				'id' => data_get($reparticao, 'id'),
+				'nome' => data_get($reparticao, 'nome') ?? data_get($reparticao, 'nome_reparticao'),
+			]));
+		} catch (QueryException) {
+			return response()->json([]);
+		}
 	}
 }

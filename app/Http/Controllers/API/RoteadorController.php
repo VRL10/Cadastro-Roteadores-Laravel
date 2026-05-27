@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Roteador;
+use App\Services\ReparticaoService;
 use App\Services\RoteadorService;
-use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RoteadorController extends Controller
 {
 	// Injeção de dependência do serviço de roteador
-	public function __construct(private readonly RoteadorService $roteadorService) {}
+	public function __construct(
+		private readonly RoteadorService $roteadorService,
+		private readonly ReparticaoService $reparticaoService,
+	) {}
 
 	// Listar os roteadores, com opção de filtro por texto
 	public function index(Request $request): JsonResponse {
@@ -23,14 +26,14 @@ class RoteadorController extends Controller
 		$roteadores = $this->roteadorService->listar($filtro !== '' ? $filtro : null);
 
 		// Retornar os roteadores em formato JSON, incluindo informações da repartição relacionada
-		return response()->json($roteadores->map(fn (Roteador $roteador) => [
-			'id' => $roteador->id,
-			'ip_roteador' => $roteador->ip_roteador,
-			'local_roteador' => $roteador->local_roteador,
-			'usuario' => $roteador->usuario,
-			'senha' => $roteador->senha,
-			'reparticao_id' => $roteador->reparticao_id,
-			'nome_reparticao' => $roteador->reparticao?->nome_reparticao,
+		return response()->json($roteadores->map(fn ($roteador) => [
+			'id' => data_get($roteador, 'id'),
+			'ip_roteador' => data_get($roteador, 'ip_roteador'),
+			'local_roteador' => data_get($roteador, 'local_roteador'),
+			'usuario' => data_get($roteador, 'usuario'),
+			'senha' => data_get($roteador, 'senha'),
+			'reparticao_id' => data_get($roteador, 'reparticao_id'),
+			'nome_reparticao' => data_get($roteador, 'reparticao.nome_reparticao') ?? data_get($roteador, 'nome_reparticao'),
 		]));
 	}
 
@@ -38,12 +41,24 @@ class RoteadorController extends Controller
 	public function store(Request $request): JsonResponse {
 		// Validar os dados de entrada para criar um novo roteador
 		$dados = $request->validate([
-			'ip_roteador' => ['required', 'string', 'max:50', 'unique:roteadores,ip_roteador'],
+			'ip_roteador' => ['required', 'string', 'max:50'],
 			'local_roteador' => ['required', 'string', 'max:255'],
 			'usuario' => ['required', 'string', 'max:255'],
 			'senha' => ['required', 'string', 'max:255'],
-			'reparticao_id' => ['required', 'integer', 'exists:reparticoes,id'],
+			'reparticao_id' => ['required', 'integer'],
 		]);
+
+		if ($this->roteadorService->existeIpRoteador($dados['ip_roteador'])) {
+			throw ValidationException::withMessages([
+				'ip_roteador' => 'Este IP de roteador ja esta cadastrado.',
+			]);
+		}
+
+		if (! $this->reparticaoService->buscarPorId((int) $dados['reparticao_id'])) {
+			throw ValidationException::withMessages([
+				'reparticao_id' => 'A reparticao informada nao foi encontrada.',
+			]);
+		}
 		
 		// Cadastrar o novo roteador usando o serviço
 		$this->roteadorService->cadastrar($dados);
@@ -56,15 +71,33 @@ class RoteadorController extends Controller
 	}
 
 	// Atualizar um roteador existente
-	public function update(Request $request, Roteador $roteador): JsonResponse
+	public function update(Request $request, string $roteadorId): JsonResponse
 	{
+		$roteador = $this->roteadorService->buscarPorId((int) $roteadorId);
+
+		if (! $roteador) {
+			return response()->json(['mensagem' => 'Roteador nao encontrado.'], 404);
+		}
+
 		$dados = $request->validate([
-			'ip_roteador' => ['required', 'string', 'max:50', 'unique:roteadores,ip_roteador,'.$roteador->id],
+			'ip_roteador' => ['required', 'string', 'max:50'],
 			'local_roteador' => ['required', 'string', 'max:255'],
 			'usuario' => ['required', 'string', 'max:255'],
 			'senha' => ['required', 'string', 'max:255'],
-			'reparticao_id' => ['required', 'integer', 'exists:reparticoes,id'],
+			'reparticao_id' => ['required', 'integer'],
 		]);
+
+		if ($this->roteadorService->existeIpRoteador($dados['ip_roteador'], (int) data_get($roteador, 'id'))) {
+			throw ValidationException::withMessages([
+				'ip_roteador' => 'Este IP de roteador ja esta cadastrado.',
+			]);
+		}
+
+		if (! $this->reparticaoService->buscarPorId((int) $dados['reparticao_id'])) {
+			throw ValidationException::withMessages([
+				'reparticao_id' => 'A reparticao informada nao foi encontrada.',
+			]);
+		}
 
 		// Atualizar o roteador usando o serviço
 		$this->roteadorService->atualizar($roteador, $dados);
@@ -77,16 +110,15 @@ class RoteadorController extends Controller
 	}
 
 	// Excluir um roteador
-	public function destroy(Roteador $roteador): JsonResponse{
-		// Excluir o roteador usando o serviço, tratando a exceção caso existam MACs vinculados
-		try {
-			$this->roteadorService->excluir($roteador);
-		} catch (QueryException) {
-			return response()->json([
-				'sucesso' => false,
-				'mensagem' => 'Nao foi possivel excluir o roteador porque existem MACs vinculados.',
-			], 400);
+	public function destroy(string $roteadorId): JsonResponse{
+		$roteador = $this->roteadorService->buscarPorId((int) $roteadorId);
+
+		if (! $roteador) {
+			return response()->json(['mensagem' => 'Roteador nao encontrado.'], 404);
 		}
+
+		// Excluir o roteador usando o serviço
+		$this->roteadorService->excluir($roteador);
 
 		// Retornar uma resposta JSON indicando sucesso
 		return response()->json([
@@ -98,10 +130,10 @@ class RoteadorController extends Controller
 	// Listar os roteadores para uso em combo box (id, ip_roteador e nome_reparticao)
 	public function combo(): JsonResponse {
 		// Obter os roteadores para combo box usando o serviço e formatar os dados para incluir id, ip_roteador e nome_reparticao
-		$dados = $this->roteadorService->listarParaCombobox()->map(fn (Roteador $roteador) => [
-			'id' => $roteador->id,
-			'ip' => $roteador->ip_roteador,
-			'reparticao' => $roteador->reparticao?->nome_reparticao,
+		$dados = $this->roteadorService->listarParaCombobox()->map(fn ($roteador) => [
+			'id' => data_get($roteador, 'id'),
+			'ip' => data_get($roteador, 'ip_roteador') ?? data_get($roteador, 'ip'),
+			'reparticao' => data_get($roteador, 'reparticao.nome_reparticao') ?? data_get($roteador, 'reparticao') ?? data_get($roteador, 'nome_reparticao'),
 		]);
 
 		return response()->json($dados);
@@ -119,9 +151,9 @@ class RoteadorController extends Controller
 
 		// Retornar os dados do último roteador em formato JSON, incluindo id, ip_roteador e nome_reparticao
 		return response()->json([
-			'id' => $ultimo->id,
-			'ip' => $ultimo->ip_roteador,
-			'reparticao' => $ultimo->reparticao?->nome_reparticao,
+			'id' => data_get($ultimo, 'id'),
+			'ip' => data_get($ultimo, 'ip_roteador') ?? data_get($ultimo, 'ip'),
+			'reparticao' => data_get($ultimo, 'reparticao.nome_reparticao') ?? data_get($ultimo, 'nome_reparticao'),
 		]);
 	}
 }
