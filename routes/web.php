@@ -7,7 +7,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Auth/Login', [
+    if (auth()->check()) {
+        return redirect()->route('SistemaCadastro');
+    }
+
+    return Inertia::render('auth/Login', [
         'canResetPassword' => Route::has('password.request'),
         'status' => session('status'),
     ]);
@@ -31,13 +35,9 @@ Route::middleware('auth')->group(function () {
         ->name('password.update');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('SistemaCadastro');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::get('/SistemaCadastro', function () {
     return Inertia::render('SistemaCadastro');
-})->middleware(['auth', 'verified'])->name('SistemaCadastro');
+})->middleware('auth')->name('SistemaCadastro');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -46,3 +46,15 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Rota de conveniência para desenvolvimento: loga como `victor@gmail.com` e redireciona.
+if (app()->environment('local')) {
+    Route::get('/login-as-victor', function () {
+        $user = \App\Models\User::where('email', 'victor@gmail.com')->first();
+        if (! $user) {
+            abort(404, 'User not found');
+        }
+        auth()->login($user);
+        return redirect()->route('SistemaCadastro');
+    });
+}

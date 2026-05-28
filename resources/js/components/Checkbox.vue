@@ -26,6 +26,7 @@ const proxyChecked = computed({
 
 <template>
     <input
+        v-bind="$attrs"
         type="checkbox"
         :value="value"
         v-model="proxyChecked"

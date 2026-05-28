@@ -37,7 +37,7 @@ const showingNavigationDropdown = ref(false);
                                     :href="route('SistemaCadastro')"
                                     :active="route().current('SistemaCadastro')"
                                 >
-                                    Dashboard
+                                    Sistema de Cadastro
                                 </NavLink>
                             </div>
                         </div>
@@ -144,7 +144,7 @@ const showingNavigationDropdown = ref(false);
                             :href="route('SistemaCadastro')"
                             :active="route().current('SistemaCadastro')"
                         >
-                            Dashboard
+                            Sistema de Cadastro
                         </ResponsiveNavLink>
                     </div>
 

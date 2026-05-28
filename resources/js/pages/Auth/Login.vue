@@ -16,17 +16,48 @@ defineProps({
     },
 });
 
-// Alterado de 'email' para 'name'
 const form = useForm({
-    name: '', 
+    email: '',
     password: '',
     remember: false,
 });
 
 const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
-    });
+    // Fallback para submissão tradicional: garante envio do CSRF no body
+    // e evita problemas intermitentes com XHR/Inertia ao autenticar.
+    const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+    const csrf = tokenMeta ? tokenMeta.getAttribute('content') : null;
+
+    const el = document.createElement('form');
+    el.method = 'POST';
+    el.action = route('login');
+
+    const inputToken = document.createElement('input');
+    inputToken.type = 'hidden';
+    inputToken.name = '_token';
+    inputToken.value = csrf || '';
+    el.appendChild(inputToken);
+
+    const inputEmail = document.createElement('input');
+    inputEmail.type = 'hidden';
+    inputEmail.name = 'email';
+    inputEmail.value = form.email;
+    el.appendChild(inputEmail);
+
+    const inputPassword = document.createElement('input');
+    inputPassword.type = 'hidden';
+    inputPassword.name = 'password';
+    inputPassword.value = form.password;
+    el.appendChild(inputPassword);
+
+    const inputRemember = document.createElement('input');
+    inputRemember.type = 'hidden';
+    inputRemember.name = 'remember';
+    inputRemember.value = form.remember ? '1' : '0';
+    el.appendChild(inputRemember);
+
+    document.body.appendChild(el);
+    el.submit();
 };
 </script>
 
@@ -39,21 +70,20 @@ const submit = () => {
         </div>
 
         <form @submit.prevent="submit">
-            <!-- Campo de Email alterado para Nome -->
             <div>
-                <InputLabel for="name" value="Nome" />
+                <InputLabel for="email" value="E-mail" />
 
                 <TextInput
-                    id="name"
-                    type="text"
+                    id="email"
+                    type="email"
                     class="mt-1 block w-full"
-                    v-model="form.name"
+                    v-model="form.email"
                     required
                     autofocus
-                    autocomplete="username"
+                    autocomplete="email"
                 />
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">

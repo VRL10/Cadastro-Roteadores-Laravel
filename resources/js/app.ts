@@ -39,7 +39,11 @@ createInertiaApp({
     // titulo dinâmico para cada página
     title: (title) => `${title} - ${appName}`,
     // Define o caminho das páginas do Inertia.js, usando a função resolvePageComponent para resolver os componentes de página com base no nome da rota...
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
+    resolve: (name) => {
+        const pageName = name.replace(/^Auth\//, 'auth/');
+
+        return resolvePageComponent(`./pages/${pageName}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue'));
+    },
     
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
