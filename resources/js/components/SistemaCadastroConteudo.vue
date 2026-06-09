@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, unref } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps<{ sistema: any }>();
 
@@ -16,7 +17,17 @@ const macBloqueado = computed(() => Boolean(props.sistema.selecionado.mac) && !u
             <div class="rg-cabecalho-gradiente">
                 <h1>&#x1F3E2; Sistema de Cadastro - Repartições e Roteadores</h1>
             </div>
-        </div>
+
+            <button
+                type="button"
+                class="btn-erro"
+                @click="router.post('/logout', {}, { onSuccess: () => window.location.href = '/' })"
+                style="font-weight: bold; background-color: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; position: relative; z-index: 99999 !important;"
+            >
+                &#x1F6AA; Sair do Sistema
+            </button>
+
+            </div>
         <!-- Conteúdo principal da página -->
         <div class="rg-conteudo">
             <!-- Alerta de notificação -->
