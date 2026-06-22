@@ -18,14 +18,27 @@ const macBloqueado = computed(() => Boolean(props.sistema.selecionado.mac) && !u
                 <h1>&#x1F3E2; Sistema de Cadastro - Repartições e Roteadores</h1>
             </div>
 
-            <button
-                type="button"
-                class="btn-erro"
-                @click="router.post('/logout', {}, { onSuccess: () => window.location.href = '/' })"
-                style="font-weight: bold; background-color: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; position: relative; z-index: 99999 !important;"
-            >
-                &#x1F6AA; Sair do Sistema
-            </button>
+             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: 15px;">
+
+                <button
+                    type="button"
+                    @click="router.visit('/register')"
+                    style="font-weight: bold; background-color: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;"
+                >
+                    &#x1F6AA; Registrar Gestor
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-erro"
+                    @click="router.post('/logout')"
+                    style="font-weight: bold; background-color: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; position: relative; z-index: 99999 !important;"
+                >
+                    &#x1F6AA; Sair do Sistema
+                </button>
+
+            </div>
+
 
             </div>
         <!-- Conteúdo principal da página -->

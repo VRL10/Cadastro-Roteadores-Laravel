@@ -13,10 +13,8 @@ Route::get('/', function () {
         return redirect()->route('SistemaCadastro');
     }
 
-    return Inertia::render('auth/Login', [
-        'canResetPassword' => Route::has('password.request'),
-        'status' => session('status'),
-    ]);
+        return redirect()->route('login');
+
 });
 
 
