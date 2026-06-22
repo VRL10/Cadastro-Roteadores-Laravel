@@ -42,6 +42,33 @@ Desenvolvimento de uma aplicação web que centraliza:
 
 ## 🖥️ Telas do Sistema
 
+### 🔑 Login
+
+Realize a autenticação de usuário no sistema.
+
+| ![Cadastro de Repartição](login.png) |
+|:---:|
+| *Tela de Login* |
+
+**Funcionalidades:**
+- Realização de login
+- Recuperação de credenciais
+
+---
+
+### 📋 Registrar
+
+Efetue o registro de novos Gestores ao sistema, acessível apenas à Administradores.
+
+| ![Cadastro de Repartição](registrar-gestores.png) |
+|:---:|
+| *Tela de Regsitro* |
+
+**Funcionalidades:**
+- Realização de registro de Gestores
+
+---
+
 ### 🏢 Cadastro de Repartições
 
 Gerencie os órgãos, escolas ou unidades administrativas.
